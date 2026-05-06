@@ -312,6 +312,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   window._fbSignIn=(e,p)=>signInWithEmailAndPassword(auth,e,p);
   window._fbSignOut=()=>signOut(auth);
   window._fbOnAuth=(cb)=>onAuthStateChanged(auth,cb);
+  window.allowedCompany = "f_estates";
   document.dispatchEvent(new Event('firebaseReady'));
 </script>
 </head>

@@ -3770,15 +3770,18 @@ async function openTeamModal(){
   await refreshTeamList();
 }
 
+// Workers are stored at two paths:
+// 1. workerMap/{workerUid}  → so workers can find their admin on login (individual read allowed)
+// 2. chantierPro/users/{adminUid}/workers/{workerUid} → so admin can list all workers (under their own accessible path)
+function _adminWorkersPath(){ return 'chantierPro/users/'+_uid+'/workers'; }
+
 async function refreshTeamList(){
   const list=document.getElementById('teamList');
   list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:4px 0">Chargement…</div>';
   try{
-    const workerMapData=await window._fbGet('workerMap');
-    const workers=Object.entries(workerMapData||{})
-      .filter(([uid,w])=>w&&w.adminUid===_uid)
-      .map(([uid,w])=>({uid,...w}));
-    // Update teamMeta in sidebar
+    // Read from admin's own path — always accessible
+    const workersData=await window._fbGet(_adminWorkersPath());
+    const workers=Object.entries(workersData||{}).map(([uid,w])=>({uid,...w}));
     const meta=document.getElementById('teamMeta');
     if(meta) meta.textContent=workers.length===0?'Aucun':workers.length+' collaborateur'+(workers.length>1?'s':'');
     if(workers.length===0){
@@ -3787,10 +3790,7 @@ async function refreshTeamList(){
     }
     list.innerHTML=workers.map(w=>{
       const chIds=w.allowedChantiers||[];
-      const chNames=chIds.map(cid=>{
-        // search in admin's full chantier list (state may be filtered for worker, but here we're admin)
-        return state.chantiers.find(c=>c.id===cid)?.name||'Chantier #'+cid;
-      }).join(', ')||'Aucun chantier';
+      const chNames=chIds.map(cid=>state.chantiers.find(c=>c.id===cid)?.name||'Chantier #'+cid).join(', ')||'Aucun chantier';
       return `<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--paper3);border-radius:8px;margin-bottom:8px;background:var(--paper)">
         <div style="flex:1;min-width:0">
           <div style="font-weight:600;font-size:14px">${escHtml(w.name||'')}</div>
@@ -3838,7 +3838,7 @@ function openAddWorkerModal(){
 
 async function openEditWorkerModal(workerUid){
   if(_isWorker)return;
-  const workerData=await window._fbGet('workerMap/'+workerUid).catch(()=>null);
+  const workerData=await window._fbGet(_adminWorkersPath()+'/'+workerUid).catch(()=>null);
   if(!workerData){showToast('⚠ Collaborateur introuvable');return;}
   document.getElementById('workerModalTitle').textContent='✏ '+escHtml(workerData.name||'Collaborateur');
   document.getElementById('wmWorkerUid').value=workerUid;
@@ -3864,16 +3864,21 @@ async function saveWorker(){
   btn.disabled=true;btn.textContent='Enregistrement…';
   try{
     if(!uid){
-      // NEW worker — create Firebase Auth account
+      // NEW worker — create Firebase Auth account using secondary app
       if(!password||password.length<6){showToast('⚠ Mot de passe: min. 6 caractères');return;}
       showToast('⏳ Création du compte…');
       const workerUid=await window._fbCreateWorkerAccount(email,password);
-      await window._fbSet('workerMap/'+workerUid,{adminUid:_uid,name,email,allowedChantiers,createdAt:Date.now()});
+      const workerEntry={adminUid:_uid,name,email,allowedChantiers,createdAt:Date.now()};
+      // Save to admin's own path (for listing) + workerMap (for worker login detection)
+      await window._fbSet(_adminWorkersPath()+'/'+workerUid,workerEntry);
+      await window._fbSet('workerMap/'+workerUid,workerEntry);
       showToast('✅ Compte créé pour '+name);
     } else {
-      // EDIT — update name + access only (password change requires admin SDK)
-      const existing=await window._fbGet('workerMap/'+uid).catch(()=>({}));
-      await window._fbSet('workerMap/'+uid,{...existing,name,allowedChantiers});
+      // EDIT — update name + access only
+      const existing=await window._fbGet(_adminWorkersPath()+'/'+uid).catch(()=>({}));
+      const updated={...existing,name,allowedChantiers};
+      await window._fbSet(_adminWorkersPath()+'/'+uid,updated);
+      await window._fbSet('workerMap/'+uid,updated);
       showToast('✅ Accès mis à jour');
     }
     closeModal('workerModal');
@@ -3893,6 +3898,7 @@ async function confirmDeleteWorker(){
   if(!uid)return;
   if(!confirm('Supprimer '+name+' ? Il ne pourra plus se connecter.'))return;
   try{
+    await window._fbSet(_adminWorkersPath()+'/'+uid,null);
     await window._fbSet('workerMap/'+uid,null);
     closeModal('workerModal');
     showToast('🗑 Collaborateur supprimé');

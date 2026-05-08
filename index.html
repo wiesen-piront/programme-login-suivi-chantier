@@ -1086,7 +1086,7 @@ async function _idbDel(id){const db=await _idbOpen();return new Promise((res,rej
 // Each chunk < 7MB (base64 chars), stored at /planFiles/{uid}/{planId}/c0, c1, …
 // Meta at /planFiles/{uid}/{planId}/meta — backward compat with old {data} format
 const _FB_CHUNK = 7000000; // 7M base64 chars ≈ 5.25MB binary — well under 10MB limit
-function _fbPlanPath(planId){ return 'planFiles/'+_uid+'/'+planId; }
+function _fbPlanPath(planId){ return 'chantierPro/planFiles/'+_uid+'/'+planId; }
 
 async function _fbSavePlanFile(planId, data){
   if(!window._fbSet||!_uid) return;
@@ -1096,11 +1096,11 @@ async function _fbSavePlanFile(planId, data){
     await window._fbSet(_fbPlanPath(planId)+'/meta',{savedAt:Date.now(),n,len:data.length});
     // Save each chunk individually (each well under 10MB)
     for(let i=0;i<n;i++){
-      if(n>1) showToast('☁ Sync plan '+( i+1)+'/'+n+'…');
+      showToast('☁ Sync plan '+(i+1)+'/'+n+'…');
       await window._fbSet(_fbPlanPath(planId)+'/c'+i, data.slice(i*_FB_CHUNK,(i+1)*_FB_CHUNK));
     }
-    if(n>1) showToast('☁ Plan synchronisé ('+n+' parties)');
-  }catch(e){ console.warn('Plan cloud save failed',e); showToast('⚠ Sync cloud échoué'); }
+    showToast('✅ Plan synchronisé dans le cloud');
+  }catch(e){ console.warn('Plan cloud save failed',e); showToast('⚠ Sync cloud échoué — vérifiez connexion/règles Firebase'); }
 }
 
 function _fbReadNode(path,timeoutMs=15000){

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -56,7 +56,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 
 /* LAYOUT */
 .layout{display:flex;min-height:calc(100vh - 56px);}
-.sidebar{width:270px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--paper3);padding:1.25rem 1rem;display:flex;flex-direction:column;gap:.3rem;overflow-y:auto;}
+.sidebar{width:270px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--paper3);padding:1.25rem 1rem;display:flex;flex-direction:column;gap:.3rem;overflow-y:auto;transition:transform .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1),padding .3s;position:relative;}
+.sidebar.collapsed{transform:translateX(-100%);width:0;padding:0;overflow:hidden;border:none;}
+.sidebar-toggle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:200;background:var(--accent);color:#fff;border:none;border-radius:0 8px 8px 0;width:22px;height:56px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:2px 0 8px rgba(0,0,0,.15);transition:left .3s cubic-bezier(.4,0,.2,1);}
+.sidebar-toggle.open{left:270px;}
+@media(max-width:700px){.sidebar{width:230px;}.sidebar-toggle.open{left:230px;}.kpi-row{grid-template-columns:repeat(3,1fr);}.dash-filter-bar{flex-direction:column;gap:.75rem;}}
+@media(max-width:500px){.sidebar-toggle.open{left:230px;}}
 .sidebar-title{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase;padding:0 .5rem;margin-bottom:.2rem;margin-top:.75rem;}
 
 /* NAV ITEMS (dashboard/rapport) */
@@ -222,6 +227,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .prereq-check.checked{background:var(--green);border-color:var(--green);color:#fff;}
 .prereq-text{font-size:13px;color:var(--ink2);line-height:1.4;flex:1;cursor:pointer;}
 .prereq-text.checked{color:var(--ink3);text-decoration:line-through;}
+.prereq-del-btn{background:none;border:none;color:var(--ink3);cursor:pointer;padding:2px 5px;font-size:14px;opacity:0;transition:opacity .15s;flex-shrink:0;line-height:1;}
+.prereq-item:hover .prereq-del-btn{opacity:1;}
+.prereq-add-input{width:100%;padding:6px 10px;border:1.5px dashed var(--paper3);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:transparent;color:var(--ink);outline:none;margin-top:6px;box-sizing:border-box;}
+.prereq-add-input:focus{border-color:var(--accent2);background:#fff;}
 .note-input{width:100%;margin-top:10px;padding:8px 10px;border:1px solid var(--paper3);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--ink2);background:#fff;resize:none;transition:border .15s;}
 .note-input:focus{outline:none;border-color:var(--accent2);}
 .note-label{font-size:11px;color:var(--ink3);margin-top:10px;margin-bottom:4px;display:block;}
@@ -511,6 +520,67 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1;}
+
+/* ── Réunion slide panel ── */
+.reunion-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:550;display:none;}
+.reunion-overlay.open{display:block;}
+.reunion-panel{position:fixed;top:0;right:0;bottom:0;width:500px;max-width:100vw;background:#fff;box-shadow:-6px 0 32px rgba(0,0,0,.15);z-index:551;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.reunion-panel.open{transform:translateX(0);}
+.reunion-panel-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--accent);color:#fff;}
+.reunion-panel-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.reunion-panel-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.reunion-panel-close:hover{background:rgba(255,255,255,.3);}
+.reunion-panel-body{flex:1;overflow-y:auto;padding:1.25rem;}
+.reunion-panel-footer{padding:1rem 1.5rem;border-top:1px solid var(--paper3);flex-shrink:0;}
+.reunion-card{background:var(--paper);border:1px solid var(--paper3);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.reunion-card-header{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.reunion-card-header:hover{background:var(--paper2);}
+.reunion-card-date{font-weight:700;font-size:14px;color:var(--ink);}
+.reunion-card-participants{font-size:12px;color:var(--ink3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.reunion-card-chevron{color:var(--ink3);transition:transform .2s;font-size:12px;}
+.reunion-card.open .reunion-card-chevron{transform:rotate(180deg);}
+.reunion-card-body{display:none;padding:0 14px 14px;}
+.reunion-card.open .reunion-card-body{display:block;}
+.reunion-topic{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--paper3);align-items:flex-start;}
+.reunion-topic:last-child{border-bottom:none;}
+.reunion-topic-text{font-size:13px;color:var(--ink2);flex:1;}
+.reunion-topic-decision{font-size:11px;color:var(--accent);font-weight:600;background:var(--blue-bg);padding:2px 7px;border-radius:12px;white-space:nowrap;}
+.reunion-edit-form{background:#fff;border:1.5px solid var(--accent2);border-radius:10px;padding:1rem;margin-bottom:12px;}
+.reunion-form-label{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block;margin-top:10px;}
+.reunion-form-label:first-child{margin-top:0;}
+.reunion-form-input{width:100%;padding:8px 10px;border:1.5px solid var(--paper3);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--ink);box-sizing:border-box;}
+.reunion-form-input:focus{outline:none;border-color:var(--accent2);}
+.reunion-topic-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.reunion-topic-row input{flex:1;padding:6px 9px;border:1.5px solid var(--paper3);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;}
+.reunion-topic-row input:focus{outline:none;border-color:var(--accent2);}
+.reunion-topic-row .dec-input{width:120px;flex:none;}
+.reunion-topic-del{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:16px;padding:0 4px;}
+.reunion-add-topic-btn{background:none;border:1.5px dashed var(--paper3);color:var(--ink3);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;width:100%;margin-top:4px;}
+.reunion-add-topic-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.reunion-open-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);transition:all .15s;}
+.reunion-open-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.reunion-attach-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.reunion-attach-item{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--paper3);}
+.reunion-attach-item img{width:80px;height:70px;object-fit:cover;display:block;}
+.reunion-attach-item .pdf-thumb{width:80px;height:70px;background:var(--paper2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--ink3);gap:4px;}
+.reunion-attach-del{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:4px;width:18px;height:18px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.reunion-attach-add{width:80px;height:70px;border:1.5px dashed var(--paper3);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:22px;background:var(--paper);}
+.reunion-attach-add:hover{border-color:var(--accent2);color:var(--accent2);}
+.reunion-chantier-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.reunion-ch-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--paper3);background:#fff;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);transition:all .15s;}
+.reunion-ch-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.reunion-print-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--paper3);background:var(--paper);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);}
+.reunion-print-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.rf-participants-box{border:1.5px solid var(--paper3);border-radius:8px;background:#fff;padding:8px;cursor:text;transition:border .15s;}
+.rf-participants-box:focus-within{border-color:var(--accent2);}
+.rf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.rf-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;}
+.rf-chip-del{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:0;font-size:14px;line-height:1;display:flex;align-items:center;}
+.rf-chip-del:hover{color:#fff;}
+.rf-type-input{border:none;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);min-width:160px;flex:1;padding:2px 4px;background:transparent;}
+.rf-suggestions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.rf-suggestion{padding:4px 10px;border:1.5px solid var(--paper3);border-radius:20px;font-size:12px;cursor:pointer;background:var(--paper);color:var(--ink2);transition:all .15s;white-space:nowrap;}
+.rf-suggestion:hover,.rf-suggestion.sel{background:var(--accent2);color:#fff;border-color:var(--accent2);}
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--ink3);}
 .empty-state .es-icon{font-size:48px;margin-bottom:1rem;}
 .empty-state h3{font-size:16px;font-weight:500;color:var(--ink2);margin-bottom:.5rem;}
@@ -552,7 +622,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .weather-warn{background:#fffbe8;border-color:#f0d060;padding:6px 12px;border-radius:8px;font-size:12px;color:#7a5a00;margin-top:6px;display:flex;align-items:center;gap:6px;width:100%;}
 
 @media(max-width:700px){.sidebar{width:230px;}.kpi-row{grid-template-columns:repeat(3,1fr);}.dash-filter-bar{flex-direction:column;gap:.75rem;}}
-@media(max-width:500px){.sidebar{display:none;}.kpi-row{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
 @media print{
   #loginScreen{display:none!important;}
   .header,.sidebar,.checklist-header-btns,.filter-bar,.step-actions,.add-btn,.add-step-btn,.back-btn,.project-notes-header{display:none!important;}
@@ -591,6 +661,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 </script>
 </head>
 <body>
+
+<button class="sidebar-toggle open" id="sidebarToggle" onclick="toggleSidebar()" title="Masquer/afficher la navigation">‹</button>
 
 <div id="loginScreen">
   <div class="login-card">
@@ -643,6 +715,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <div class="nav-item" id="navTeam" onclick="openTeamModal()" style="display:none">
       <div class="nav-icon" style="background:#e8f5e9">👥</div>
       <div class="nav-info"><div class="nav-name">Mon équipe</div><div class="nav-meta" id="teamMeta">—</div></div>
+    </div>
+    <div class="nav-item" id="navReunions" onclick="openReunionPanelSidebar()">
+      <div class="nav-icon" style="background:#fff3e0">📋</div>
+      <div class="nav-info"><div class="nav-name">Réunions de chantier</div><div class="nav-meta" id="reunionNavMeta">—</div></div>
     </div>
     <div class="sidebar-title" style="margin-top:1rem">Mes chantiers</div>
     <div id="chantierList"></div>
@@ -1015,6 +1091,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- RÉUNION SLIDE PANEL -->
+<div class="reunion-overlay" id="reunionOverlay" onclick="closeReunionPanel()"></div>
+<div class="reunion-panel" id="reunionPanel">
+  <div class="reunion-panel-header">
+    <div class="reunion-panel-title" id="reunionPanelTitle">📋 Réunions de chantier</div>
+    <button class="reunion-panel-close" onclick="closeReunionPanel()">✕</button>
+  </div>
+  <div class="reunion-panel-body" id="reunionPanelBody">
+  </div>
+  <div class="reunion-panel-footer" id="reunionPanelFooter">
+    <button class="btn-confirm" style="width:100%" onclick="openNewReunionForm()">＋ Nouvelle réunion</button>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════
 //  TEMPLATES
@@ -1259,6 +1349,7 @@ function migrateData(data){
       ...c,
       mainContact:c.mainContact||'',
       contacts:c.contacts||[],
+      reunions:c.reunions||[],
       plans:(c.plans||[]).map(p=>({...p,pins:p.pins||[],type:p.type||(p.data&&p.data.startsWith('data:image')?'image/jpeg':'application/pdf')})),
       location:c.location||'',
       phases:(c.phases||[]).map(ph=>({
@@ -1305,7 +1396,8 @@ function createPhase(type){
 function getPhaseTemplate(ph){
   if(ph.type==='custom') return {label:ph.customName||'Personnalisé',icon:'🔧'};
   const map={go:{label:'Gros œuvre',icon:'🏗'},apt:{label:'Résidence',icon:'🏠'},maison:{label:'Maison',icon:'🏡'}};
-  return map[ph.type]||{label:ph.type,icon:'📋'};
+  const base=map[ph.type]||{label:ph.type,icon:'📋'};
+  return {label:ph.customName||base.label,icon:base.icon};
 }
 
 // ════════════════════════════════════════
@@ -1322,6 +1414,9 @@ function renderSidebar(){
   if(addBtn) addBtn.style.display=_isWorker?'none':'';
   const stMeta=document.getElementById('stMeta');
   if(stMeta) stMeta.textContent=state.sousTraitants.length===0?'Aucun':state.sousTraitants.length+' contact'+(state.sousTraitants.length>1?'s':'');
+  const totalReunions=state.chantiers.reduce((a,c)=>a+(c.reunions||[]).length,0);
+  const reunionMeta=document.getElementById('reunionNavMeta');
+  if(reunionMeta) reunionMeta.textContent=totalReunions===0?'—':totalReunions+' réunion'+(totalReunions>1?'s':'');
   _updateProbMeta();
   const td=state.chantiers.reduce((a,c)=>a+c.phases.reduce((b,p)=>b+p.steps.filter(s=>s.done).length,0),0);
   const tt=state.chantiers.reduce((a,c)=>a+c.phases.reduce((b,p)=>b+p.steps.length,0),0);
@@ -1526,7 +1621,7 @@ function renderChecklist(cid,pid){
     stepsHtml=shown.length===0?`<div class="filter-empty">Aucune étape dans cette catégorie.</div>`
       :shown.map(({s,i,st})=>{
         const numCls=st==='done'?'done':st==='can'?'can':st==='inprogress'?'inprogress':'';
-        const prereqsHtml=s.prereqs.map((pt,pi)=>`<div class="prereq-item"><div class="prereq-check ${s.checked[pi]?'checked':''}" onclick="togglePrereq(${cid},${pid},${i},${pi})">${s.checked[pi]?'✓':''}</div><div class="prereq-text ${s.checked[pi]?'checked':''}" onclick="togglePrereq(${cid},${pid},${i},${pi})">${escHtml(pt)}</div></div>`).join('');
+        const prereqsHtml=s.prereqs.map((pt,pi)=>`<div class="prereq-item"><div class="prereq-check ${s.checked[pi]?'checked':''}" onclick="togglePrereq(${cid},${pid},${i},${pi})">${s.checked[pi]?'✓':''}</div><div class="prereq-text ${s.checked[pi]?'checked':''}" onclick="togglePrereq(${cid},${pid},${i},${pi})">${escHtml(pt)}</div>${!_isWorker?`<button class="prereq-del-btn" onclick="deletePrereq(${cid},${pid},${i},${pi})" title="Supprimer">×</button>`:''}</div>`).join('');
         const dateHtml=s.doneAt?`<div class="step-date done-date">✓ Terminé le ${formatDate(s.doneAt)}</div>`:s.startedAt?`<div class="step-date started-date">▶ Démarré le ${formatDate(s.startedAt)}</div>`:'';
         const actionBtns=st==='done'?`<button class="step-btn step-btn-grey" onclick="markUndone(${cid},${pid},${i})">↩ Rouvrir</button>`
           :st==='inprogress'?`<button class="step-btn step-btn-grey" onclick="markUndone(${cid},${pid},${i})">↩ Rouvrir</button><button class="step-btn step-btn-green" onclick="markDone(${cid},${pid},${i})">✓ Terminé</button>`
@@ -1545,7 +1640,7 @@ function renderChecklist(cid,pid){
               ontouchend="stepTouchEnd(event)">⠿</div>
             <div class="step-num ${numCls}">${i+1}</div>
             <div class="step-info">
-              <div class="step-name">${escHtml(s.name)}</div>
+              <div class="step-name" ondblclick="event.stopPropagation();openEditStepModal(${cid},${pid},${i})" title="Double-cliquer pour modifier" style="cursor:pointer">${escHtml(s.name)}</div>
               ${s.remark?`<div class="step-remark">${escHtml(s.remark)} ${phaseTag}</div>`:(s.phase?`<div class="step-remark">${phaseTag}</div>`:'')}
             </div>
             <div class="step-badge ${statusBadge(st)}">${statusLabel(st)}</div>
@@ -1553,6 +1648,7 @@ function renderChecklist(cid,pid){
           </div>
           <div class="prereqs">
             ${prereqsHtml||'<p style="font-size:12px;color:var(--ink3);padding:4px 0">Aucun prérequis défini.</p>'}
+            ${!_isWorker?`<input class="prereq-add-input" placeholder="＋ Ajouter un prérequis…" onkeydown="if(event.key==='Enter'&&this.value.trim()){addPrereqInline(${cid},${pid},${i},this.value);this.value='';}">`:'' }
             ${dateHtml}
             ${renderSTSection(cid,pid,i,s)}
             ${renderPhotoSection(cid,pid,i,s)}
@@ -1578,8 +1674,8 @@ function renderChecklist(cid,pid){
   document.getElementById('mainContent').innerHTML=`<div class="checklist-view">
     <div class="checklist-header">
       <div class="checklist-title-group">
-        <div class="checklist-type">${tmpl.icon} ${tmpl.label}</div>
-        <div class="checklist-title">${escHtml(ch.name)}</div>
+        <div class="checklist-type">${tmpl.icon} ${tmpl.label}${!_isWorker?` <button class="icon-btn" onclick="renamePhase(${cid},${pid})" title="Renommer la phase" style="font-size:11px;padding:2px 7px;margin-left:6px;opacity:.55">✏</button>`:''}</div>
+        <div class="checklist-title" ${!_isWorker?`ondblclick="inlineEditChantierName(${cid})" title="Double-cliquer pour renommer" style="cursor:pointer"`:``}>${escHtml(ch.name)}</div>
         <div class="checklist-contact-line">
           <span class="checklist-contact-label">👤</span>
           <input class="checklist-contact-input" id="mainContactInput_${cid}"
@@ -3715,6 +3811,13 @@ function updateHeaderLogo(){
   }
 }
 
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const btn=document.getElementById('sidebarToggle');
+  const collapsed=sb.classList.toggle('collapsed');
+  btn.textContent=collapsed?'›':'‹';
+  btn.classList.toggle('open',!collapsed);
+}
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
 
@@ -3728,7 +3831,7 @@ document.addEventListener('click',e=>{
 });
 document.getElementById('planViewerOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('planViewerOverlay')) closePlanViewer(); });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(id=>closeModal(id)); closeLightbox(); closePlanViewer(); }
+  if(e.key==='Escape'){ ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(id=>closeModal(id)); closeLightbox(); closePlanViewer(); closeReunionPanel(); }
   if(e.key==='Enter'){
     const ls=document.getElementById('loginScreen');
     if(ls&&ls.style.display!=='none')doLogin();
@@ -3759,6 +3862,414 @@ function installApp(){
 }
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+// ════════════════════════════════════════
+//  RÉUNIONS DE CHANTIER
+// ════════════════════════════════════════
+let _reunionCid=null;
+let _rfAttachments=[]; // [{name,type,data}]
+
+function openReunionPanel(cid){
+  _reunionCid=cid;
+  document.getElementById('reunionOverlay').classList.add('open');
+  const panel=document.getElementById('reunionPanel');
+  panel.classList.add('open');
+  panel.style.transform='';
+  renderReunionPanel();
+}
+function openReunionPanelSidebar(){
+  const cid=state.currentChantierId||state.chantiers[0]?.id;
+  if(!cid&&state.chantiers.length===0){showToast('⚠ Aucun chantier disponible');return;}
+  _reunionCid=cid||null;
+  document.getElementById('reunionOverlay').classList.add('open');
+  const panel=document.getElementById('reunionPanel');
+  panel.classList.add('open');
+  panel.style.transform='';
+  document.getElementById('reunionPanelTitle').textContent='📋 Réunions de chantier';
+  renderReunionPanel();
+}
+function closeReunionPanel(){
+  document.getElementById('reunionOverlay').classList.remove('open');
+  const panel=document.getElementById('reunionPanel');
+  panel.classList.remove('open');
+  panel.style.transform='';
+  _reunionCid=null;
+  // Reset footer
+  document.getElementById('reunionPanelFooter').innerHTML=`<button class="btn-confirm" style="width:100%" onclick="openNewReunionForm()">＋ Nouvelle réunion</button>`;
+}
+
+// ── Swipe to close ──
+(function(){
+  let _sx=0,_sy=0,_dragging=false;
+  document.addEventListener('touchstart',e=>{
+    const panel=document.getElementById('reunionPanel');
+    if(!panel.classList.contains('open'))return;
+    _sx=e.touches[0].clientX;_sy=e.touches[0].clientY;_dragging=false;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    const panel=document.getElementById('reunionPanel');
+    if(!panel.classList.contains('open'))return;
+    const dx=e.touches[0].clientX-_sx;
+    const dy=Math.abs(e.touches[0].clientY-_sy);
+    if(!_dragging&&Math.abs(dx)<10&&dy<10)return;
+    if(!_dragging&&dy>Math.abs(dx))return;
+    _dragging=true;
+    if(dx>0){panel.style.transition='none';panel.style.transform=`translateX(${dx}px)`;}
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    const panel=document.getElementById('reunionPanel');
+    if(!panel.classList.contains('open')||!_dragging)return;
+    const dx=e.changedTouches[0].clientX-_sx;
+    panel.style.transition='';
+    if(dx>100) closeReunionPanel();
+    else panel.style.transform='';
+    _dragging=false;
+  },{passive:true});
+})()
+
+function _getAllReunions(){
+  // Returns [{chantier, idx, r}] across all chantiers, filtered by _reunionCid if set
+  const result=[];
+  state.chantiers.forEach(ch=>{
+    if(_reunionCid&&ch.id!==_reunionCid)return;
+    (ch.reunions||[]).forEach((r,idx)=>result.push({ch,idx,r}));
+  });
+  return result.sort((a,b)=>(b.r.date||'').localeCompare(a.r.date||''));
+}
+
+function renderReunionPanel(){
+  const body=document.getElementById('reunionPanelBody');
+  // Chantier filter tabs
+  const tabsHtml=`<div class="reunion-chantier-bar">
+    <button class="reunion-ch-tab ${!_reunionCid?'active':''}" onclick="_setReunionFilter(null)">Tous</button>
+    ${state.chantiers.map(c=>`<button class="reunion-ch-tab ${_reunionCid===c.id?'active':''}" onclick="_setReunionFilter(${c.id})">${escHtml(c.name)}</button>`).join('')}
+  </div>`;
+  const all=_getAllReunions();
+  if(all.length===0){
+    body.innerHTML=tabsHtml+'<div style="text-align:center;padding:2.5rem 1rem;color:var(--ink3);font-size:13px">Aucune réunion.<br>Cliquez sur "＋ Nouvelle réunion" pour commencer.</div>';
+    return;
+  }
+  body.innerHTML=tabsHtml+all.map(({ch,idx,r})=>{
+    const topicsHtml=(r.topics||[]).map(t=>`
+      <div class="reunion-topic">
+        <div class="reunion-topic-text">• ${escHtml(t.text||'')}</div>
+        ${t.decision?`<div class="reunion-topic-decision">${escHtml(t.decision)}</div>`:''}
+      </div>`).join('');
+    const attachHtml=(r.attachments||[]).map(a=>
+      a.type&&a.type.startsWith('image/')?`<div class="reunion-attach-item"><img src="${a.data}" onclick="openReunionAttach('${a.data}','${escHtml(a.name)}')"></div>`
+      :`<div class="reunion-attach-item"><div class="pdf-thumb" onclick="openReunionAttach('${a.data}','${escHtml(a.name)}')">📄<span>${escHtml(a.name.length>10?a.name.slice(0,10)+'…':a.name)}</span></div></div>`
+    ).join('');
+    const chantierLabel=r.chantierCustom?`🏗 ${escHtml(r.chantierCustom)}`:`🏗 ${escHtml(ch.name)}`;
+    return `<div class="reunion-card" id="rc_${r.id}">
+      <div class="reunion-card-header" onclick="toggleReunionCard('${r.id}')">
+        <div style="min-width:0">
+          <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:2px">${chantierLabel}</div>
+          <div class="reunion-card-date">📅 ${escHtml(r.date||'—')}</div>
+          <div class="reunion-card-participants">👥 ${escHtml(r.participants||'—')}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+          <button class="reunion-print-btn" onclick="event.stopPropagation();printReunion(${ch.id},${idx})" title="Imprimer rapport">🖨</button>
+          ${!_isWorker?`<button class="back-btn" style="padding:4px 9px;font-size:11px" onclick="event.stopPropagation();editReunionForm(${ch.id},${idx})">✏</button>
+          <button class="back-btn" style="padding:4px 9px;font-size:11px;border-color:rgba(180,0,0,.3);color:#c00" onclick="event.stopPropagation();deleteReunion(${ch.id},${idx})">🗑</button>`:''}
+          <span class="reunion-card-chevron">▼</span>
+        </div>
+      </div>
+      <div class="reunion-card-body">
+        ${topicsHtml||'<div style="font-size:13px;color:var(--ink3)">Aucun point noté.</div>'}
+        ${r.notes?`<div style="margin-top:10px;padding:10px;background:var(--paper2);border-radius:7px;font-size:13px;color:var(--ink2)">📝 ${escHtml(r.notes)}</div>`:''}
+        ${attachHtml?`<div class="reunion-attach-grid" style="margin-top:10px">${attachHtml}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function _setReunionFilter(cid){ _reunionCid=cid; renderReunionPanel(); }
+function toggleReunionCard(id){ document.getElementById('rc_'+id)?.classList.toggle('open'); }
+function openReunionAttach(data,name){
+  if(data.startsWith('data:application/pdf')||name.endsWith('.pdf')){
+    const win=window.open('','_blank');
+    win.document.write(`<iframe src="${data}" style="width:100%;height:100vh;border:none"></iframe>`);
+  } else {
+    const win=window.open('','_blank');
+    win.document.write(`<img src="${data}" style="max-width:100%;height:auto">`);
+  }
+}
+
+function openNewReunionForm(){ _showReunionForm(null,null); }
+function editReunionForm(cid,idx){ _reunionCid=cid; _showReunionForm(cid,idx); }
+
+function _buildTopicsHtml(topics){
+  return topics.map((t,i)=>`
+    <div class="reunion-topic-row" id="rtrow_${i}">
+      <input placeholder="Point discuté…" value="${escHtml(t.text||'')}" oninput="_rfTopicUpdate(${i},'text',this.value)">
+      <input class="dec-input" placeholder="Décision" value="${escHtml(t.decision||'')}" oninput="_rfTopicUpdate(${i},'decision',this.value)">
+      <button class="reunion-topic-del" onclick="_rfTopicDel(${i})">×</button>
+    </div>`).join('');
+}
+function _buildAttachPreview(){
+  const el=document.getElementById('rfAttachPreview');
+  if(!el)return;
+  el.innerHTML=`<div class="reunion-attach-grid">`+_rfAttachments.map((a,i)=>
+    a.type&&a.type.startsWith('image/')?`<div class="reunion-attach-item"><img src="${a.data}"><button class="reunion-attach-del" onclick="_rfDelAttach(${i})">×</button></div>`
+    :`<div class="reunion-attach-item"><div class="pdf-thumb">📄<span>${escHtml(a.name.length>9?a.name.slice(0,9)+'…':a.name)}</span></div><button class="reunion-attach-del" onclick="_rfDelAttach(${i})">×</button></div>`
+  ).join('')+`<div class="reunion-attach-add" onclick="document.getElementById('rfFileInput').click()">＋</div></div>`;
+}
+
+function _showReunionForm(cid,idx){
+  const targetCid=cid||_reunionCid||state.chantiers[0]?.id;
+  const ch=getChantier(targetCid);
+  const r=idx!==null&&idx!==undefined?(ch?.reunions||[])[idx]:null;
+  const topics=r?.topics||[{text:'',decision:''}];
+  _rfAttachments=r?.attachments?[...r.attachments]:[];
+  const body=document.getElementById('reunionPanelBody');
+  const footer=document.getElementById('reunionPanelFooter');
+  const chantierOpts=state.chantiers.map(c=>`<option value="${c.id}" ${(r?r.chantierId===c.id:c.id===targetCid)?'selected':''}>${escHtml(c.name)}</option>`).join('');
+  body.innerHTML=`<div class="reunion-edit-form">
+    <span class="reunion-form-label">Chantier</span>
+    <select class="reunion-form-input" id="rfChantierId" onchange="rfChantierChange(this.value)">
+      ${chantierOpts}
+      <option value="autre" ${r?.chantierCustom?'selected':''}>Autre (saisir manuellement)</option>
+    </select>
+    <input class="reunion-form-input" id="rfChantierCustom" placeholder="Nom du chantier…" value="${escHtml(r?.chantierCustom||'')}" style="margin-top:6px;display:${r?.chantierCustom?'block':'none'}">
+    <span class="reunion-form-label">Date de la réunion</span>
+    <input class="reunion-form-input" type="date" id="rfDate" value="${r?.date||new Date().toISOString().slice(0,10)}">
+    <span class="reunion-form-label">Participants</span>
+    <div class="rf-participants-box" onclick="document.getElementById('rfPartInput').focus()">
+      <div class="rf-chips" id="rfChips"></div>
+      <input class="rf-type-input" id="rfPartInput" placeholder="Ajouter un participant…"
+        onkeydown="rfPartKeydown(event)" oninput="rfPartFilter(this.value)">
+    </div>
+    <div class="rf-suggestions" id="rfSuggestions"></div>
+    <span class="reunion-form-label">Points abordés <span style="font-weight:400;color:var(--ink3)">(sujet → décision)</span></span>
+    <div id="rfTopics">${_buildTopicsHtml(topics)}</div>
+    <button class="reunion-add-topic-btn" onclick="_rfAddTopic()">＋ Ajouter un point</button>
+    <span class="reunion-form-label" style="margin-top:12px">Notes / Prochaine réunion</span>
+    <textarea class="reunion-form-input" id="rfNotes" rows="3" placeholder="ex. Prochaine réunion le 16.05…">${escHtml(r?.notes||'')}</textarea>
+    <span class="reunion-form-label" style="margin-top:12px">Pièces jointes <span style="font-weight:400;color:var(--ink3)">(photos, PDF)</span></span>
+    <div id="rfAttachPreview"></div>
+    <input type="file" id="rfFileInput" accept="image/*,application/pdf" multiple style="display:none" onchange="rfAddFiles(event)">
+  </div>`;
+  document.getElementById('rfTopics')._topics=[...topics];
+  _buildAttachPreview();
+  // Init participants chips from existing data
+  _rfParticipants=(r?.participants||'').split(',').map(s=>s.trim()).filter(Boolean);
+  _rfRenderChips();
+  _rfRenderSuggestions('');
+  footer.innerHTML=`<div style="display:flex;gap:8px">
+    <button class="btn-cancel" style="flex:1" onclick="_rfCancel()">Annuler</button>
+    <button class="btn-confirm" style="flex:2" onclick="_rfSave(${cid},${idx})">💾 Enregistrer</button>
+  </div>`;
+}
+
+// ── Participant chip selector ──
+let _rfParticipants=[];
+function _rfGetAllContacts(){
+  const names=new Set();
+  // Sous-traitants
+  (state.sousTraitants||[]).forEach(st=>{ if(st.name) names.add(st.name); });
+  // Chantier contacts
+  state.chantiers.forEach(c=>{
+    (c.contacts||[]).forEach(ct=>{ if(ct.name) names.add(ct.name); });
+    if(c.mainContact) names.add(c.mainContact);
+  });
+  return [...names].sort();
+}
+function _rfRenderChips(){
+  const el=document.getElementById('rfChips');
+  if(!el)return;
+  el.innerHTML=_rfParticipants.map((p,i)=>
+    `<span class="rf-chip">${escHtml(p)}<button class="rf-chip-del" onclick="_rfRemoveChip(${i})">×</button></span>`
+  ).join('');
+}
+function _rfRenderSuggestions(filter){
+  const el=document.getElementById('rfSuggestions');
+  if(!el)return;
+  const all=_rfGetAllContacts().filter(n=>!_rfParticipants.includes(n)&&n.toLowerCase().includes(filter.toLowerCase()));
+  el.innerHTML=all.map(n=>`<span class="rf-suggestion" onclick="_rfAddChip('${escHtml(n)}')">${escHtml(n)}</span>`).join('');
+}
+function _rfAddChip(name){
+  const n=name.trim();
+  if(!n||_rfParticipants.includes(n))return;
+  _rfParticipants.push(n);
+  _rfRenderChips();
+  _rfRenderSuggestions('');
+  const inp=document.getElementById('rfPartInput');
+  if(inp){inp.value='';inp.focus();}
+}
+function _rfRemoveChip(i){
+  _rfParticipants.splice(i,1);
+  _rfRenderChips();
+  _rfRenderSuggestions(document.getElementById('rfPartInput')?.value||'');
+}
+function rfPartKeydown(e){
+  const val=e.target.value.trim();
+  if((e.key==='Enter'||e.key===',')&&val){e.preventDefault();_rfAddChip(val);}
+  else if(e.key==='Backspace'&&!val&&_rfParticipants.length){ _rfParticipants.pop();_rfRenderChips();_rfRenderSuggestions('');}
+}
+function rfPartFilter(val){ _rfRenderSuggestions(val); }
+
+function rfChantierChange(val){
+  document.getElementById('rfChantierCustom').style.display=val==='autre'?'block':'none';
+}
+function _rfDelAttach(i){ _rfAttachments.splice(i,1); _buildAttachPreview(); }
+function rfAddFiles(e){
+  const files=[...e.target.files];
+  files.forEach(file=>{
+    if(file.size>5*1024*1024){showToast('⚠ Fichier trop lourd (max 5 Mo): '+file.name);return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      _rfAttachments.push({name:file.name,type:file.type,data:ev.target.result});
+      _buildAttachPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function _rfTopicUpdate(i,field,val){
+  const el=document.getElementById('rfTopics');
+  if(!el._topics)el._topics=[];
+  if(!el._topics[i])el._topics[i]={text:'',decision:''};
+  el._topics[i][field]=val;
+}
+function _rfAddTopic(){
+  const el=document.getElementById('rfTopics');
+  if(!el._topics)el._topics=[];
+  el._topics.push({text:'',decision:''});
+  const j=el._topics.length-1;
+  el.innerHTML+=`<div class="reunion-topic-row" id="rtrow_${j}">
+    <input placeholder="Point discuté…" value="" oninput="_rfTopicUpdate(${j},'text',this.value)">
+    <input class="dec-input" placeholder="Décision" value="" oninput="_rfTopicUpdate(${j},'decision',this.value)">
+    <button class="reunion-topic-del" onclick="_rfTopicDel(${j})">×</button>
+  </div>`;
+  el.querySelectorAll('.reunion-topic-row input')[el._topics.length*2-2]?.focus();
+}
+function _rfTopicDel(i){
+  const el=document.getElementById('rfTopics');
+  if(!el._topics)return;
+  el._topics.splice(i,1);
+  el.innerHTML=_buildTopicsHtml(el._topics);
+}
+function _rfSave(cid,idx){
+  const selEl=document.getElementById('rfChantierId');
+  const selVal=selEl.value;
+  const isCustom=selVal==='autre';
+  const targetCid=isCustom?(_reunionCid||state.chantiers[0]?.id):parseInt(selVal);
+  const ch=getChantier(targetCid);
+  if(!ch){showToast('⚠ Chantier introuvable');return;}
+  if(!ch.reunions)ch.reunions=[];
+  const topicsEl=document.getElementById('rfTopics');
+  const topics=(topicsEl._topics||[]).filter(t=>t.text.trim());
+  const oldR=idx!==null&&idx!==undefined?(ch.reunions||[])[idx]:null;
+  const entry={
+    id:oldR?oldR.id:Date.now(),
+    chantierId:isCustom?null:targetCid,
+    chantierCustom:isCustom?document.getElementById('rfChantierCustom').value.trim():'',
+    date:document.getElementById('rfDate').value,
+    participants:_rfParticipants.join(', '),
+    topics,
+    notes:document.getElementById('rfNotes').value.trim(),
+    attachments:_rfAttachments,
+    createdAt:oldR?oldR.createdAt:Date.now()
+  };
+  // If editing and chantier changed, remove from old chantier
+  if(idx!==null&&idx!==undefined&&cid&&cid!==targetCid){
+    const oldCh=getChantier(cid);
+    if(oldCh?.reunions) oldCh.reunions.splice(idx,1);
+    ch.reunions.push(entry);
+  } else if(idx!==null&&idx!==undefined){
+    ch.reunions[idx]=entry;
+  } else {
+    ch.reunions.push(entry);
+  }
+  autoSave();render();renderReunionPanel();
+  document.getElementById('reunionPanelFooter').innerHTML=`<button class="btn-confirm" style="width:100%" onclick="openNewReunionForm()">＋ Nouvelle réunion</button>`;
+  showToast('✅ Réunion enregistrée');
+  _rfAttachments=[];
+}
+function _rfCancel(){
+  renderReunionPanel();
+  document.getElementById('reunionPanelFooter').innerHTML=`<button class="btn-confirm" style="width:100%" onclick="openNewReunionForm()">＋ Nouvelle réunion</button>`;
+  _rfAttachments=[];
+}
+function deleteReunion(cid,idx){
+  if(!confirm('Supprimer cette réunion ?'))return;
+  const ch=getChantier(cid);
+  ch.reunions.splice(idx,1);
+  autoSave();render();renderReunionPanel();
+  showToast('🗑 Réunion supprimée');
+}
+function printReunion(cid,idx){
+  const ch=getChantier(cid);
+  const r=(ch?.reunions||[])[idx];
+  if(!r)return;
+  const chName=r.chantierCustom||ch?.name||'—';
+  const topicsRows=(r.topics||[]).map(t=>`<tr><td style="padding:6px 10px;border-bottom:1px solid #eee">${t.text||''}</td><td style="padding:6px 10px;border-bottom:1px solid #eee;color:#1a3a8a;font-weight:600">${t.decision||'—'}</td></tr>`).join('');
+  const attachHtml=(r.attachments||[]).filter(a=>a.type?.startsWith('image/')).map(a=>`<img src="${a.data}" style="max-width:200px;max-height:160px;border-radius:6px;border:1px solid #ddd;object-fit:cover">`).join('');
+  const logo=state.profile?.logo?`<img src="${state.profile.logo}" style="height:40px;object-fit:contain">`:
+    `<span style="font-size:18px;font-weight:700;color:#0b1d4d">${escHtml(state.profile?.companyName||'')}</span>`;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Réunion de chantier — ${chName}</title>
+  <style>body{font-family:Arial,sans-serif;color:#111;margin:0;padding:32px;max-width:800px;margin:auto}
+  h1{font-size:20px;color:#0b1d4d;margin-bottom:4px}h2{font-size:14px;color:#666;font-weight:400;margin-bottom:24px}
+  .meta{display:flex;gap:32px;margin-bottom:20px;padding:12px 16px;background:#f5f7fb;border-radius:8px}
+  .meta-item label{font-size:10px;text-transform:uppercase;color:#888;display:block}
+  .meta-item span{font-size:13px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px}
+  th{background:#0b1d4d;color:#fff;text-align:left;padding:8px 10px;font-size:12px}
+  .notes{background:#f5f7fb;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:20px}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #0b1d4d}
+  .photos{display:flex;flex-wrap:wrap;gap:10px}
+  @media print{body{padding:20px}}</style></head><body>
+  <div class="header">${logo}<div style="text-align:right;font-size:11px;color:#888">Imprimé le ${new Date().toLocaleDateString('fr-FR')}</div></div>
+  <h1>Compte-rendu de réunion de chantier</h1>
+  <h2>${escHtml(chName)}</h2>
+  <div class="meta">
+    <div class="meta-item"><label>Date</label><span>${r.date||'—'}</span></div>
+    <div class="meta-item"><label>Participants</label><span>${escHtml(r.participants||'—')}</span></div>
+  </div>
+  ${topicsRows?`<table><tr><th>Point abordé</th><th>Décision / Action</th></tr>${topicsRows}</table>`:''}
+  ${r.notes?`<div class="notes"><strong>Notes :</strong> ${escHtml(r.notes)}</div>`:''}
+  ${attachHtml?`<div><strong style="font-size:12px;color:#888;text-transform:uppercase">Photos</strong><br><br><div class="photos">${attachHtml}</div></div>`:''}
+  <div style="margin-top:40px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:11px;color:#aaa">
+    <span>Réunion du ${r.date||'—'} — ${escHtml(chName)}</span><span>Compte-rendu généré automatiquement</span></div>
+  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  win.document.close();
+}
+
+// ════════════════════════════════════════
+//  INLINE EDIT HELPERS
+// ════════════════════════════════════════
+function deletePrereq(cid,pid,si,pi){
+  if(_isWorker)return;
+  const ph=getPhase(cid,pid);
+  ph.steps[si].prereqs.splice(pi,1);
+  ph.steps[si].checked.splice(pi,1);
+  autoSave();renderChecklist(cid,pid);
+}
+function addPrereqInline(cid,pid,si,value){
+  if(!value.trim()||_isWorker)return;
+  const ph=getPhase(cid,pid);
+  ph.steps[si].prereqs.push(value.trim());
+  ph.steps[si].checked.push(false);
+  autoSave();renderChecklist(cid,pid);
+}
+function renamePhase(cid,pid){
+  if(_isWorker)return;
+  const ph=getPhase(cid,pid);
+  const tmpl=getPhaseTemplate(ph);
+  const newName=prompt('Renommer la phase:',ph.customName||tmpl.label);
+  if(newName===null)return;
+  ph.customName=newName.trim()||undefined;
+  autoSave();render();
+}
+function inlineEditChantierName(cid){
+  if(_isWorker)return;
+  const ch=getChantier(cid);
+  const newName=prompt('Renommer le chantier:',ch.name);
+  if(newName===null||!newName.trim())return;
+  ch.name=newName.trim();
+  autoSave();render();
 }
 
 // ════════════════════════════════════════
@@ -3943,6 +4454,7 @@ document.addEventListener('firebaseReady',()=>{
       state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},currentView:'dashboard',currentChantierId:null,currentPhaseId:null};
       render();
       startFirebaseListener();
+      if(!_isWorker) setTimeout(()=>refreshTeamList().catch(()=>{}),1500);
     } else {
       _uid=null;_adminUid=null;_isWorker=false;_workerName='';_allowedChantiers=[];
       state={chantiers:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null};

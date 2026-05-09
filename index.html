@@ -4616,6 +4616,7 @@ document.addEventListener('firebaseReady',()=>{
       render();
       startFirebaseListener();
       if(!_isWorker) setTimeout(()=>refreshTeamList().catch(()=>{}),1500);
+      _fbLoadApiKey(); // auto-load Claude API key from Firebase
       initAiChat();
       // Auto-collapse sidebar on mobile
       if(isMobile()){const sb=document.querySelector('.sidebar');if(sb){sb.classList.remove('mobile-open');const btn=document.getElementById('sidebarToggle');if(btn){btn.classList.remove('mobile-open');}}}
@@ -5266,9 +5267,26 @@ function _executeTool(name,input){
   }catch(e){return 'Erreur: '+e.message;}
 }
 
+function _aiKeyFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/settings/claudeApiKey'; }
+function _fbSyncApiKey(key){
+  if(!window._fbSet||!_uid) return;
+  window._fbSet(_aiKeyFbPath(), key||null).catch(()=>{});
+}
+async function _fbLoadApiKey(){
+  if(!window._fbGet||!_uid) return;
+  try{
+    var k=await window._fbGet(_aiKeyFbPath());
+    if(k && !localStorage.getItem('fe_claude_key')){
+      localStorage.setItem('fe_claude_key',k);
+      showToast('🔑 Clé API IA chargée automatiquement');
+    }
+  }catch(e){}
+}
+
 function getAiKey(){return localStorage.getItem('fe_claude_key')||'';}
 function deleteAiKey(){
   localStorage.removeItem('fe_claude_key');
+  _fbSyncApiKey(null);
   document.getElementById('aiKeyInp').value='';
   _aiMessages=[];_aiApiHistory=[];
   document.getElementById('aiMsgs').innerHTML='';
@@ -5278,11 +5296,12 @@ function saveAiKey(){
   var k=document.getElementById('aiKeyInp').value.trim();
   if(!k){alert('Veuillez entrer une clé API valide.');return;}
   localStorage.setItem('fe_claude_key',k);
+  _fbSyncApiKey(k); // sync to Firebase → available on all devices
   _aiShowKey=false;
   document.getElementById('aiKeyBox').style.display='none';
   document.getElementById('aiMsgs').style.display='flex';
   document.getElementById('aiFooter').style.display='flex';
-  _addAiMsg('assistant','✅ Clé API enregistrée ! Je peux lire vos données ET effectuer des actions (ajouter des sous-traitants, marquer des tâches, etc.). Comment puis-je vous aider ?');
+  _addAiMsg('assistant','✅ Clé API enregistrée et synchronisée sur tous vos appareils !');
 }
 
 // ═══════════════════════════════════════════

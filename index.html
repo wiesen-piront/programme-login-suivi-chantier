@@ -623,6 +623,54 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 
 @media(max-width:700px){.sidebar{width:230px;}.kpi-row{grid-template-columns:repeat(3,1fr);}.dash-filter-bar{flex-direction:column;gap:.75rem;}}
 @media(max-width:500px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+/* ── PLANNING MODULE ── */
+.plan-row td{padding:8px 12px;border-bottom:1px solid var(--paper2);vertical-align:middle;}
+.plan-row:last-child td{border-bottom:none;}
+.plan-row:hover td{background:var(--paper);}
+.plan-row-done td{opacity:.55;}
+.plan-row-overdue td{background:#fff5f5;}
+.plan-row-urgent td{background:#fffbf0;}
+.plan-row-inprogress td{background:#f0f5ff;}
+.plan-toggle{color:var(--ink3);user-select:none;font-size:10px;}
+.plan-alert-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--red);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--red);font-weight:600;}
+.plan-alert-chip.urgent{border-color:var(--orange);color:var(--orange);}
+.plan-alert-chip.starting{border-color:var(--blue);color:var(--blue);}
+/* Dashboard alert widget */
+.dash-alert-box{background:var(--red-bg);border:1.5px solid #e8aaaa;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.dash-alert-box.has-urgent{border-color:#f59e0b;background:#fffbf0;}
+.dash-alert-row{display:flex;align-items:center;gap:.5rem;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(0,0,0,.05);}
+.dash-alert-row:last-child{border-bottom:none;}
+/* ══ AI CHAT ══ */
+#aiChatBtn{position:fixed;bottom:24px;right:24px;z-index:999;width:52px;height:52px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:0 4px 18px rgba(11,29,77,.38);transition:all .2s;display:none;align-items:center;justify-content:center;}
+#aiChatBtn:hover{transform:scale(1.09);background:var(--accent2);}
+#aiChatBtn.shown{display:flex;}
+#aiChatPanel{position:fixed;bottom:86px;right:24px;z-index:998;width:370px;max-width:calc(100vw - 32px);height:530px;max-height:calc(100vh - 110px);background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.18);border:1px solid var(--paper3);flex-direction:column;overflow:hidden;display:none;}
+#aiChatPanel.open{display:flex;}
+.ai-ch-header{background:var(--accent);color:#fff;padding:13px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.ai-ch-title{flex:1;font-weight:600;font-size:14px;}
+.ai-ch-sub{font-size:11px;opacity:.65;margin-top:1px;}
+.ai-ch-setbtn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.ai-ch-closebtn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;opacity:.75;padding:2px 6px;line-height:1;}
+.ai-key-box{padding:18px;display:flex;flex-direction:column;gap:11px;background:#fff;}
+.ai-key-box h3{font-size:14px;font-weight:600;color:var(--ink);}
+.ai-key-box p{font-size:12px;color:var(--ink3);line-height:1.55;}
+.ai-key-inp{width:100%;padding:9px 11px;border:1.5px solid var(--paper3);border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);}
+.ai-key-inp:focus{outline:none;border-color:var(--accent2);}
+.ai-key-save{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;width:100%;}
+.ai-key-save:hover{background:var(--accent2);}
+.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.ai-m{max-width:86%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;word-break:break-word;}
+.ai-m.user{align-self:flex-end;background:var(--accent);color:#fff;border-radius:12px 12px 2px 12px;}
+.ai-m.assistant{align-self:flex-start;background:var(--paper2);color:var(--ink);border-radius:12px 12px 12px 2px;}
+.ai-m.thinking{align-self:flex-start;background:var(--paper2);color:var(--ink3);font-style:italic;border-radius:12px 12px 12px 2px;}
+.ai-m.error{align-self:flex-start;background:#faeaea;color:var(--red);border-radius:12px 12px 12px 2px;}
+.ai-m.action{align-self:flex-start;background:#ddf0e0;color:var(--green);border-radius:8px;font-size:12px;padding:6px 11px;border-left:3px solid var(--green);}
+.ai-ch-footer{padding:10px 12px;border-top:1px solid var(--paper2);display:flex;gap:8px;flex-shrink:0;background:#fff;}
+.ai-inp{flex:1;border:1.5px solid var(--paper3);border-radius:8px;padding:8px 10px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;height:38px;transition:border .15s;outline:none;overflow:hidden;}
+.ai-inp:focus{border-color:var(--accent2);}
+.ai-send{background:var(--accent);color:#fff;border:none;border-radius:8px;width:38px;height:38px;font-size:15px;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.ai-send:hover{background:var(--accent2);}
+.ai-send:disabled{opacity:.45;cursor:default;}
 @media print{
   #loginScreen{display:none!important;}
   .header,.sidebar,.checklist-header-btns,.filter-bar,.step-actions,.add-btn,.add-step-btn,.back-btn,.project-notes-header{display:none!important;}
@@ -719,6 +767,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <div class="nav-item" id="navReunions" onclick="openReunionPanelSidebar()">
       <div class="nav-icon" style="background:#fff3e0">📋</div>
       <div class="nav-info"><div class="nav-name">Réunions de chantier</div><div class="nav-meta" id="reunionNavMeta">—</div></div>
+    </div>
+    <div class="nav-item" id="navPlanning" onclick="showPlanning()">
+      <div class="nav-icon" style="background:#e8f0fe">📅</div>
+      <div class="nav-info"><div class="nav-name">Planning</div><div class="nav-meta" id="planningNavMeta">—</div></div>
     </div>
     <div class="sidebar-title" style="margin-top:1rem">Mes chantiers</div>
     <div id="chantierList"></div>
@@ -1307,7 +1359,7 @@ function saveNow(){ pushToFirebase(); showToast('💾 Sauvegardé'); }
 function pushToFirebase(){
   if(!window._fbSet||!_uid){setSyncStatus('offline');return;}
   setSyncStatus('syncing');
-  const payload={chantiers:_stripPlanData(state.chantiers),sousTraitants:state.sousTraitants,profile:state.profile,updatedAt:Date.now()};
+  const payload={chantiers:_stripPlanData(state.chantiers),sousTraitants:state.sousTraitants,profile:state.profile,plannings:state.plannings||[],updatedAt:Date.now()};
   window._fbSet(getFbPath(),payload).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('offline'));
 }
 function autoSave(){ if(!_isSyncing) pushToFirebase(); }
@@ -1322,6 +1374,11 @@ function startFirebaseListener(){
     state.chantiers=chantiers;
     state.sousTraitants=data.sousTraitants||[];
     state.profile=data.profile||{logo:null,companyName:''};
+    // Normalize plannings: fix parentId null→0 (Firebase drops null values)
+    state.plannings=(data.plannings||[]).map(pl=>({
+      ...pl,
+      tasks:(pl.tasks||[]).map(t=>({...t,parentId:t.parentId!=null?t.parentId:0}))
+    }));
     setSyncStatus('synced');render();
     setTimeout(()=>{ _isSyncing=false; },100);
   });
@@ -1417,6 +1474,10 @@ function renderSidebar(){
   const totalReunions=state.chantiers.reduce((a,c)=>a+(c.reunions||[]).length,0);
   const reunionMeta=document.getElementById('reunionNavMeta');
   if(reunionMeta) reunionMeta.textContent=totalReunions===0?'—':totalReunions+' réunion'+(totalReunions>1?'s':'');
+  const navPl=document.getElementById('navPlanning');
+  if(navPl) navPl.classList.toggle('active',state.currentView==='planning');
+  const pm=document.getElementById('planningNavMeta');
+  if(pm){ const pl=state.plannings||[]; if(!pl.length){pm.textContent='—';} else{ const palerts=getPlanningAlerts(); pm.innerHTML=palerts.length?`<span style="color:var(--red);font-weight:600">⚠️ ${palerts.length} alerte${palerts.length>1?'s':''}</span>`:(pl.reduce((a,p)=>a+(p.tasks||[]).length,0)+' tâches'); } }
   _updateProbMeta();
   const td=state.chantiers.reduce((a,c)=>a+c.phases.reduce((b,p)=>b+p.steps.filter(s=>s.done).length,0),0);
   const tt=state.chantiers.reduce((a,c)=>a+c.phases.reduce((b,p)=>b+p.steps.length,0),0);
@@ -1516,6 +1577,7 @@ function renderDashboard(){
   const selectedChantier=selCid!=='all'?state.chantiers.find(c=>c.id===selCid):null;
 
   const resultsLabel=`<div class="dash-results-label"><strong>${filtered.length}</strong> phase${filtered.length!==1?'s':''} affichée${filtered.length!==1?'s':''}</div>`;
+  let _planAlertHtml=''; try{ _planAlertHtml=renderPlanningAlertWidget(); }catch(e){}
 
   // Cards — when one chantier selected, card title = phase type (not chantier name)
   const cards=allPhases.length===0
@@ -1581,6 +1643,7 @@ function renderDashboard(){
       <div class="kpi-card"><div class="kpi-label">En cours</div><div class="kpi-value orange">${tip}</div></div>
       <div class="kpi-card"><div class="kpi-label">Peut démarrer</div><div class="kpi-value blue">${tcan}</div></div>
     </div>
+    ${_planAlertHtml}
     ${resultsLabel}
     ${cards}
   </div>`;
@@ -3821,7 +3884,7 @@ function toggleSidebar(){
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
 
-function render(){ updateHeaderLogo(); renderSidebar(); if(state.currentView==='dashboard')renderDashboard(); else if(state.currentView==='project')renderChecklist(state.currentChantierId,state.currentPhaseId); }
+function render(){ updateHeaderLogo(); renderSidebar(); if(state.currentView==='dashboard')renderDashboard(); else if(state.currentView==='project')renderChecklist(state.currentChantierId,state.currentPhaseId); else if(state.currentView==='planning')renderPlanningView(); }
 
 // Modal close handlers
 ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(id=>{ document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
@@ -4451,10 +4514,11 @@ document.addEventListener('firebaseReady',()=>{
       }
       hideLoginScreen(user);
       setSyncStatus('syncing');
-      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},currentView:'dashboard',currentChantierId:null,currentPhaseId:null};
+      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},plannings:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null,currentPlanningId:null};
       render();
       startFirebaseListener();
       if(!_isWorker) setTimeout(()=>refreshTeamList().catch(()=>{}),1500);
+      initAiChat();
     } else {
       _uid=null;_adminUid=null;_isWorker=false;_workerName='';_allowedChantiers=[];
       state={chantiers:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null};
@@ -4462,5 +4526,973 @@ document.addEventListener('firebaseReady',()=>{
     }
   });
 });
+
+// ════════════════════════════════════════
+//  PLANNING MODULE
+// ════════════════════════════════════════
+
+function showPlanning(id){
+  state.currentView='planning';
+  state.currentPlanningId=id||(state.plannings&&state.plannings.length?state.plannings[0].id:null);
+  try{ render(); } catch(e){ console.error('Planning render error:',e); document.getElementById('mainContent').innerHTML=`<div style="padding:2rem;color:var(--red);">⚠️ Erreur: ${e.message}<br><small>Essayez de supprimer et ré-importer votre planning.</small><br><br><button onclick="state.plannings=[];autoSave();showDashboard()" style="background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Réinitialiser le planning</button></div>`; }
+}
+
+// ── CSV Parser ──
+function parsePlanningCSV(text){
+  const sep=text.includes(';')?';':',';
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  const header=lines[0].split(sep).map(h=>h.trim());
+  const ni=header.findIndex(h=>/tâche|aufgabe|task|nom|name/i.test(h));
+  const si=header.findIndex(h=>/début|start/i.test(h));
+  const ei=header.findIndex(h=>/fin|ende|end/i.test(h));
+  const ri=header.findIndex(h=>/responsable|verantwortlich/i.test(h));
+  const sti=header.findIndex(h=>/statut|status/i.test(h));
+  const parseDt=(s)=>{ if(!s)return''; const m=s.trim().match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/); if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; return s.trim(); };
+  const tasks=[];
+  for(let i=1;i<lines.length;i++){
+    const c=lines[i].split(sep).map(x=>x.trim());
+    const name=ni>=0?c[ni]:'';
+    if(!name)continue;
+    tasks.push({ id:Date.now()+i*7+Math.random()*100|0, name, start:parseDt(si>=0?c[si]:''), end:parseDt(ei>=0?c[ei]:''), responsible:ri>=0?c[ri]:'', status:sti>=0?(c[sti]||'à faire'):'à faire', parentId:null, collapsed:false });
+  }
+  // Auto-detect hierarchy by date containment
+  for(let i=0;i<tasks.length;i++){
+    for(let j=i+1;j<tasks.length;j++){
+      if(tasks[j].parentId!=null)continue;
+      const p=tasks[i],ch=tasks[j];
+      if(p.start&&p.end&&ch.start&&ch.end&&ch.start>=p.start&&ch.end<=p.end){
+        let closer=false;
+        for(let k=i+1;k<j;k++){
+          if(tasks[k].start<=ch.start&&tasks[k].end>=ch.end){closer=true;break;}
+        }
+        if(!closer)ch.parentId=p.id;
+      }
+    }
+  }
+  return tasks;
+}
+
+// ── Alert Engine — only leaf tasks (no children) trigger alerts ──
+function getPlanningAlerts(){
+  if(!state.plannings||!state.plannings.length)return[];
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=[];
+  state.plannings.forEach(pl=>{
+    const tasks=pl.tasks||[];
+    const hasChildren=id=>tasks.some(t=>(t.parentId??0)===id);
+    tasks.forEach(task=>{
+      if(task.status==='fait'||!task.end)return;
+      if(hasChildren(task.id))return; // skip parent summary tasks
+      const end=new Date(task.end);
+      const start=task.start?new Date(task.start):null;
+      const dEnd=Math.ceil((end-today)/864e5);
+      const dStart=start?Math.ceil((start-today)/864e5):null;
+      if(dEnd<0) alerts.push({type:'overdue',task,planId:pl.id,planName:pl.name,days:Math.abs(dEnd)});
+      else if(dEnd<=7) alerts.push({type:'urgent',task,planId:pl.id,planName:pl.name,days:dEnd});
+      else if(dStart!=null&&dStart>0&&dStart<=14&&task.status==='à faire') alerts.push({type:'starting',task,planId:pl.id,planName:pl.name,days:dStart});
+    });
+  });
+  return alerts;
+}
+
+// ── Dashboard Alert Widget ──
+function renderPlanningAlertWidget(){
+  const alerts=getPlanningAlerts();
+  if(!alerts.length||(state.plannings||[]).length===0)return'';
+  const overdue=alerts.filter(a=>a.type==='overdue');
+  const urgent=alerts.filter(a=>a.type==='urgent');
+  const starting=alerts.filter(a=>a.type==='starting');
+  const isOnlyStarting=overdue.length===0&&urgent.length===0;
+  return`<div class="dash-alert-box${isOnlyStarting?' has-urgent':''}" style="margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;flex-wrap:wrap;">
+      <span style="font-size:14px;font-weight:700;color:${isOnlyStarting?'#b45309':'var(--red)'};">${isOnlyStarting?'📅':'⚠️'} Alertes Planning</span>
+      ${overdue.length?`<span class="plan-alert-chip">${overdue.length} en retard</span>`:''}
+      ${urgent.length?`<span class="plan-alert-chip urgent">${urgent.length} urgent${urgent.length>1?'s':''}</span>`:''}
+      ${starting.length?`<span class="plan-alert-chip starting">${starting.length} démarre bientôt</span>`:''}
+      <button onclick="showPlanning()" style="margin-left:auto;background:none;border:1.5px solid currentColor;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:inherit;font-family:'DM Sans',sans-serif;">Voir le planning →</button>
+    </div>
+    ${alerts.slice(0,5).map(a=>`<div class="dash-alert-row">
+      <span>${a.type==='overdue'?'🔴':a.type==='urgent'?'🟠':'🔵'}</span>
+      <span style="flex:1;font-weight:500;">${escHtml(a.task.name)}</span>
+      <span style="font-size:11px;color:var(--ink3);">${escHtml(a.planName)}</span>
+      <span style="font-size:12px;font-weight:600;color:${a.type==='overdue'?'var(--red)':a.type==='urgent'?'var(--orange)':'var(--blue)'};">
+        ${a.type==='overdue'?`+${a.days}j de retard`:a.type==='urgent'?`J-${a.days}`:`Démarre dans ${a.days}j`}
+      </span>
+    </div>`).join('')}
+    ${alerts.length>5?`<div style="font-size:12px;color:var(--ink3);padding-top:4px;">+${alerts.length-5} autres alertes</div>`:''}
+  </div>`;
+}
+
+// ── Planning View Renderer ──
+var _planFilter='all';
+var _planViewMode='gantt'; // 'table' or 'gantt'
+
+function buildGanttHtml(tasks, today, filter, descendantsMatch, hasKids){
+  // Build flat ordered list of visible tasks with depth
+  function flatten(parentId, depth){
+    return tasks
+      .filter(t=>(t.parentId??0)===parentId)
+      .filter(t=>descendantsMatch(t.id))
+      .flatMap(task=>{
+        const children=(!task.collapsed&&hasKids(task.id))?flatten(task.id,depth+1):[];
+        return [{task,depth},...children];
+      });
+  }
+  const flat=flatten(0,0);
+  if(!flat.length)return '<p style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px;">Aucune tâche visible</p>';
+
+  // Date range
+  const allDs=flat.flatMap(({task})=>[task.start,task.end]).filter(Boolean).map(d=>new Date(d));
+  if(!allDs.length)return '<p style="padding:1rem;color:var(--ink3)">Dates manquantes dans le planning.</p>';
+  let minD=new Date(Math.min(...allDs.map(d=>d.getTime())));
+  let maxD=new Date(Math.max(...allDs.map(d=>d.getTime())));
+  minD=new Date(minD.getFullYear(),minD.getMonth(),1); // start of month
+  maxD=new Date(maxD.getFullYear(),maxD.getMonth()+1,0); // end of month
+  const totalDays=Math.floor((maxD-minD)/86400000)+1;
+
+  // Scale: try to fit ~18 months comfortably; 3px/day
+  const PPD=3;
+  const LW=220; // label column width
+  const RH=30;  // row height
+  const HDR=28; // header height
+  const totalW=totalDays*PPD;
+
+  const dayOff=d=>Math.floor((new Date(d)-minD)/86400000);
+
+  // Month headers
+  const months=[];
+  let mc=new Date(minD.getFullYear(),minD.getMonth(),1);
+  while(mc<=maxD){
+    const mEnd=new Date(mc.getFullYear(),mc.getMonth()+1,0);
+    const left=Math.max(0,dayOff(mc))*PPD;
+    const right=Math.min(totalDays-1,dayOff(mEnd))*PPD+PPD;
+    months.push({label:mc.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}),left,width:right-left});
+    mc=new Date(mc.getFullYear(),mc.getMonth()+1,1);
+  }
+
+  // Today
+  const todayOff=dayOff(today);
+  const showToday=todayOff>=0&&todayOff<totalDays;
+
+  // Bar color
+  function bColor(task){
+    if(task.status==='fait')return'#22c55e';
+    const dEnd=task.end?Math.ceil((new Date(task.end)-today)/86400000):null;
+    if(dEnd!==null&&dEnd<0)return'#ef4444';
+    if(dEnd!==null&&dEnd<=7)return'#f59e0b';
+    if(task.status==='en cours')return'#3b82f6';
+    return'#94a3b8';
+  }
+
+  // Month grid lines (reused in each row)
+  const gridLinesCss=months.map(m=>`<div style="position:absolute;left:${m.left}px;top:0;bottom:0;width:1px;background:#eff0f2;pointer-events:none;"></div>`).join('');
+
+  // Rows
+  const rowsHtml=flat.map(({task,depth},i)=>{
+    const isParent=hasKids(task.id);
+    const indent=8+depth*14;
+    const fw=depth===0?'700':depth===1?'600':'400';
+    const fs=depth===0?13:12;
+    const bg=i%2===0?'#fff':'#fafafa';
+
+    let barHtml='';
+    if(task.start&&task.end){
+      const left=dayOff(task.start)*PPD;
+      const width=Math.max(PPD*2,(dayOff(task.end)-dayOff(task.start)+1)*PPD);
+      const color=bColor(task);
+      const bh=isParent?7:14;
+      const btop=Math.round((RH-bh)/2);
+      const radius=Math.round(bh/2);
+      barHtml=`<div style="position:absolute;left:${left}px;width:${width}px;top:${btop}px;height:${bh}px;background:${color};border-radius:${radius}px;opacity:${isParent?0.55:0.92};" title="${escHtml(task.name)} : ${task.start||''} → ${task.end||''}"></div>`;
+    }
+
+    return `<div style="display:flex;height:${RH}px;border-bottom:1px solid #f1f2f4;background:${bg};">
+      <div style="width:${LW}px;flex-shrink:0;display:flex;align-items:center;padding:0 6px 0 ${indent}px;font-size:${fs}px;font-weight:${fw};color:#1f2937;overflow:hidden;border-right:1px solid #e5e7eb;position:sticky;left:0;background:${bg};z-index:3;box-shadow:2px 0 5px rgba(0,0,0,.04);">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escHtml(task.name)}">${escHtml(task.name)}</span>
+      </div>
+      <div style="position:relative;width:${totalW}px;flex-shrink:0;height:${RH}px;">
+        ${gridLinesCss}${barHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Month header HTML
+  const mHdrHtml=months.map(m=>`<div style="position:absolute;left:${m.left}px;width:${m.width}px;top:0;height:${HDR}px;border-left:1px solid #d1d5db;display:flex;align-items:center;padding:0 5px;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;white-space:nowrap;">${m.label}</div>`).join('');
+
+  const todayHtml=showToday?`<div style="position:absolute;left:${LW+todayOff*PPD}px;top:0;bottom:0;width:2px;background:rgba(239,68,68,.65);z-index:4;pointer-events:none;"><div style="position:absolute;top:0;left:0;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:0 3px 3px 0;white-space:nowrap;line-height:16px;">Aujourd'hui</div></div>`:'';
+
+  return `<div style="border:1.5px solid var(--paper3);border-radius:10px;overflow:hidden;background:#fff;">
+    <div style="padding:7px 12px;border-bottom:1px solid var(--paper2);display:flex;gap:14px;flex-wrap:wrap;font-size:11px;align-items:center;background:#f9fafb;">
+      <span style="font-weight:600;color:var(--ink3);">Légende :</span>
+      <span><span style="display:inline-block;width:14px;height:6px;background:#22c55e;border-radius:3px;vertical-align:middle;margin-right:3px;"></span>Terminé</span>
+      <span><span style="display:inline-block;width:14px;height:6px;background:#3b82f6;border-radius:3px;vertical-align:middle;margin-right:3px;"></span>En cours</span>
+      <span><span style="display:inline-block;width:14px;height:6px;background:#f59e0b;border-radius:3px;vertical-align:middle;margin-right:3px;"></span>Urgent ≤7j</span>
+      <span><span style="display:inline-block;width:14px;height:6px;background:#ef4444;border-radius:3px;vertical-align:middle;margin-right:3px;"></span>En retard</span>
+      <span><span style="display:inline-block;width:14px;height:6px;background:#94a3b8;border-radius:3px;vertical-align:middle;margin-right:3px;"></span>À faire</span>
+      <span style="margin-left:auto;color:var(--ink3);">← Faites défiler horizontalement →</span>
+    </div>
+    <div style="overflow-x:auto;position:relative;">
+      <div style="min-width:${LW+totalW}px;position:relative;">
+        ${todayHtml}
+        <div style="display:flex;height:${HDR}px;background:#f4f5f7;border-bottom:2px solid #dde0e8;position:sticky;top:0;z-index:10;">
+          <div style="width:${LW}px;flex-shrink:0;border-right:1px solid #dde0e8;font-size:11px;font-weight:700;color:#6b7280;display:flex;align-items:center;padding-left:8px;position:sticky;left:0;background:#f4f5f7;z-index:11;">Tâche / Aufgabe</div>
+          <div style="position:relative;width:${totalW}px;flex-shrink:0;overflow:hidden;height:${HDR}px;">${mHdrHtml}</div>
+        </div>
+        ${rowsHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPlanningView(){
+  const m=document.getElementById('mainContent');
+  const plannings=state.plannings||[];
+
+  if(plannings.length===0){
+    m.innerHTML=`<div style="padding:3rem;text-align:center;color:var(--ink3);">
+      <div style="font-size:52px;margin-bottom:1rem;">📅</div>
+      <div style="font-size:20px;font-weight:700;color:var(--ink);margin-bottom:.5rem;">Aucun planning importé</div>
+      <div style="font-size:14px;margin-bottom:1.75rem;">Importez un fichier CSV (MS Project, Excel, Numbers…)</div>
+      <button onclick="importPlanningFile()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;">📥 Importer un planning CSV</button>
+      <input type="file" id="planningImportInput" accept=".csv,.txt" style="display:none" onchange="handlePlanningImport(event)">
+      <div style="margin-top:1.25rem;font-size:12px;color:var(--ink3);">Colonnes attendues : Tâche · Début · Fin · Responsable · Statut</div>
+    </div>`;
+    return;
+  }
+
+  const planning=plannings.find(p=>p.id===state.currentPlanningId)||plannings[0];
+  state.currentPlanningId=planning.id;
+  const today=new Date();today.setHours(0,0,0,0);
+  const tasks=planning.tasks||[];
+  const alerts=getPlanningAlerts().filter(a=>a.planId===planning.id);
+  const alertTaskIds=new Set(alerts.map(a=>a.task.id));
+  const hasKids=id=>tasks.some(t=>(t.parentId??0)===id);
+
+  // ── per-task status helper ──
+  function taskDend(task){ return task.end?Math.ceil((new Date(task.end)-today)/864e5):null; }
+  function taskAlert(task){
+    if(task.status==='fait')return'done';
+    const d=taskDend(task);
+    if(d!==null&&d<0)return'overdue';
+    if(d!==null&&d<=7)return'urgent';
+    if(task.status==='en cours')return'inprogress';
+    return'todo';
+  }
+
+  // ── filter: which tasks are visible ──
+  // A parent is shown if ANY of its descendants matches the filter
+  function descendantsMatch(taskId){
+    const children=tasks.filter(t=>(t.parentId??null)===taskId);
+    if(!children.length){
+      const t=tasks.find(t=>t.id===taskId);
+      if(!t)return false;
+      const a=taskAlert(t);
+      if(_planFilter==='all')return true;
+      if(_planFilter==='alerts')return a==='overdue'||a==='urgent';
+      if(_planFilter==='inprogress')return a==='inprogress';
+      if(_planFilter==='todo')return a==='todo';
+      if(_planFilter==='done')return a==='done';
+      return true;
+    }
+    return children.some(c=>descendantsMatch(c.id));
+  }
+
+  // ── rows renderer (BUG FIX: use ?? null for parentId comparison) ──
+  function rowsHtml(parentId,depth){
+    return tasks
+      .filter(t=>(t.parentId??0)===parentId)
+      .filter(t=>descendantsMatch(t.id))
+      .map(task=>{
+        const kids=hasKids(task.id);
+        const dEnd=taskDend(task);
+        const alert=taskAlert(task);
+        const rowBg=alert==='overdue'?'#fff5f5':alert==='urgent'?'#fffbf0':alert==='inprogress'?'#f4f7ff':'';
+        const icon=alert==='done'?'✅':alert==='overdue'?'🔴':alert==='urgent'?'🟠':alert==='inprogress'?'🔵':'⚪';
+        const pl=12+depth*20;
+        const fw=depth===0?'700':depth===1?'600':'400';
+        const childHtml=kids&&!task.collapsed?rowsHtml(task.id,depth+1):'';
+        const retardLabel=dEnd!==null&&dEnd<0?`<span style="background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 5px;font-size:11px;font-weight:700;margin-left:4px;">+${Math.abs(dEnd)}j</span>`:'';
+        const urgentLabel=dEnd!==null&&dEnd>=0&&dEnd<=7&&task.status!=='fait'?`<span style="background:var(--orange-bg);color:var(--orange);border-radius:4px;padding:1px 5px;font-size:11px;font-weight:700;margin-left:4px;">J-${dEnd}</span>`:'';
+        return`<tr style="background:${rowBg};">
+          <td style="padding:7px 10px 7px ${pl}px;border-bottom:1px solid var(--paper2);">
+            ${kids?`<span onclick="togglePlanTask(${planning.id},${task.id})" style="cursor:pointer;margin-right:5px;font-size:10px;color:var(--ink3);user-select:none;">${task.collapsed?'▶':'▼'}</span>`:'<span style="display:inline-block;width:15px;margin-right:5px;"></span>'}
+            <span style="font-weight:${fw};font-size:13px;">${icon} ${escHtml(task.name)}</span>
+            ${retardLabel}${urgentLabel}
+          </td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--paper2);font-size:12px;color:var(--ink3);white-space:nowrap;">${formatDateShort(task.start)||'—'}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--paper2);font-size:12px;white-space:nowrap;font-weight:${dEnd!==null&&dEnd<0?'700':'400'};color:${dEnd!==null&&dEnd<0?'var(--red)':'var(--ink2)'};">${formatDateShort(task.end)||'—'}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--paper2);font-size:12px;color:var(--ink3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(task.responsible||'—')}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--paper2);">
+            <select onchange="updateTaskStatus(${planning.id},${task.id},this.value)" style="font-size:12px;padding:3px 6px;border:1.5px solid var(--paper3);border-radius:6px;background:${task.status==='fait'?'var(--green-bg)':task.status==='en cours'?'var(--blue-bg)':'var(--grey-bg)'};font-family:'DM Sans',sans-serif;cursor:pointer;">
+              <option value="à faire"${task.status==='à faire'?' selected':''}>⚪ À faire</option>
+              <option value="en cours"${task.status==='en cours'?' selected':''}>🔵 En cours</option>
+              <option value="fait"${task.status==='fait'?' selected':''}>✅ Fait</option>
+            </select>
+          </td>
+          <td style="padding:7px 8px;border-bottom:1px solid var(--paper2);white-space:nowrap;">
+            <button onclick="editPlanTask(${planning.id},${task.id})" title="Modifier" style="background:none;border:none;cursor:pointer;font-size:13px;padding:3px;">✏️</button>
+            <button onclick="addSubTask(${planning.id},${task.id})" title="Sous-tâche" style="background:none;border:none;cursor:pointer;font-size:13px;padding:3px;">＋</button>
+            <button onclick="deletePlanTask(${planning.id},${task.id})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:13px;padding:3px;opacity:.4;">🗑</button>
+          </td>
+        </tr>${childHtml}`;
+      }).join('');
+  }
+
+  const done=tasks.filter(t=>t.status==='fait').length;
+  const inprog=tasks.filter(t=>t.status==='en cours').length;
+  const total=tasks.length;
+  const pct=total?Math.round(done/total*100):0;
+
+  const filterBtns=[
+    {k:'all',l:'Tout',count:total},
+    {k:'alerts',l:'⚠️ Alertes',count:alerts.length,red:true},
+    {k:'inprogress',l:'🔵 En cours',count:inprog},
+    {k:'todo',l:'⚪ À faire',count:tasks.filter(t=>t.status==='à faire').length},
+    {k:'done',l:'✅ Terminé',count:done},
+  ].map(f=>`<button onclick="_planFilter='${f.k}';renderPlanningView()" style="padding:5px 12px;border-radius:20px;border:1.5px solid ${_planFilter===f.k?'var(--accent)':'var(--paper3)'};background:${_planFilter===f.k?'var(--accent)':'#fff'};color:${_planFilter===f.k?'#fff':f.red?'var(--red)':'var(--ink)'};font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:${_planFilter===f.k?'600':'400'};">${f.l} <span style="opacity:.7;">${f.count}</span></button>`).join('');
+
+  const tableBody=rowsHtml(0,0);
+  const emptyMsg=tableBody?'':'<tr><td colspan="6" style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px;">Aucune tâche pour ce filtre</td></tr>';
+
+  m.innerHTML=`<div style="padding:1.5rem;max-width:${_planViewMode==='gantt'?'100%':'1100px'};">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Planning</div>
+        <div style="font-size:20px;font-weight:700;">${escHtml(planning.name)}</div>
+      </div>
+      ${plannings.length>1?`<select onchange="state.currentPlanningId=parseInt(this.value);_planFilter='all';renderPlanningView()" style="padding:7px 10px;border:1.5px solid var(--paper3);border-radius:8px;background:#fff;font-size:13px;font-family:'DM Sans',sans-serif;">
+        ${plannings.map(p=>`<option value="${p.id}"${p.id===planning.id?' selected':''}>${escHtml(p.name)}</option>`).join('')}
+      </select>`:''}
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+        <button onclick="addPlanTask(${planning.id},null)" style="background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;">＋ Tâche</button>
+        <button onclick="importPlanningFile()" style="background:var(--paper2);color:var(--ink);border:1.5px solid var(--paper3);border-radius:7px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">📥 CSV</button>
+        <button onclick="deletePlanning(${planning.id})" style="background:none;color:var(--ink3);border:1.5px solid var(--paper3);border-radius:7px;padding:7px 10px;font-size:13px;cursor:pointer;" title="Supprimer">🗑</button>
+      </div>
+      <input type="file" id="planningImportInput" accept=".csv,.txt" style="display:none" onchange="handlePlanningImport(event)">
+    </div>
+
+    <!-- KPI bar -->
+    <div style="background:#fff;border:1.5px solid var(--paper3);border-radius:10px;padding:.9rem 1.25rem;margin-bottom:1rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+          <span style="font-weight:600;">${done} / ${total} tâches terminées</span>
+          <span style="font-weight:700;color:var(--accent);">${pct}%</span>
+        </div>
+        <div style="background:var(--paper2);border-radius:4px;height:7px;overflow:hidden;">
+          <div style="background:var(--accent);height:100%;width:${pct}%;border-radius:4px;transition:width .3s;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:13px;"><span style="font-weight:700;color:var(--green);">${done}</span> <span style="color:var(--ink3);">terminées</span></span>
+        <span style="font-size:13px;"><span style="font-weight:700;color:var(--blue);">${inprog}</span> <span style="color:var(--ink3);">en cours</span></span>
+        ${alerts.length?`<span style="font-size:13px;"><span style="font-weight:700;color:var(--red);">⚠️ ${alerts.length}</span> <span style="color:var(--ink3);">alerte${alerts.length>1?'s':''}</span></span>`:'<span style="font-size:13px;color:var(--green);">✓ Aucune alerte</span>'}
+      </div>
+    </div>
+
+    <!-- Filter + View toggle bar -->
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;flex:1;">${filterBtns}</div>
+      <div style="display:flex;background:var(--paper2);border-radius:8px;padding:3px;gap:2px;flex-shrink:0;">
+        <button onclick="_planViewMode='table';renderPlanningView()" style="padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;background:${_planViewMode==='table'?'#fff':'transparent'};color:${_planViewMode==='table'?'var(--ink)':'var(--ink3)'};box-shadow:${_planViewMode==='table'?'0 1px 4px rgba(0,0,0,.1)':'none'};">☰ Liste</button>
+        <button onclick="_planViewMode='gantt';renderPlanningView()" style="padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;background:${_planViewMode==='gantt'?'#fff':'transparent'};color:${_planViewMode==='gantt'?'var(--ink)':'var(--ink3)'};box-shadow:${_planViewMode==='gantt'?'0 1px 4px rgba(0,0,0,.1)':'none'};">📊 Gantt</button>
+      </div>
+    </div>
+
+    <!-- Table or Gantt -->
+    ${_planViewMode==='table'?`
+    <div style="border-radius:10px;border:1.5px solid var(--paper3);background:#fff;overflow:hidden;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;min-width:600px;">
+        <thead><tr style="background:var(--paper2);">
+            <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);min-width:240px;">Tâche</th>
+            <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);">Début</th>
+            <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);">Fin</th>
+            <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);">Responsable</th>
+            <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);">Statut</th>
+            <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);">Actions</th>
+        </tr></thead>
+        <tbody>${tableBody}${emptyMsg}</tbody>
+      </table>
+    </div>`:`<div id="ganttContainer">${buildGanttHtml(tasks,today,_planFilter,descendantsMatch,hasKids)}</div>`}
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editPlanTaskModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:#fff;border-radius:14px;padding:1.75rem;width:420px;max-width:calc(100vw - 2rem);box-shadow:0 24px 60px rgba(0,0,0,.18);">
+      <div style="font-size:17px;font-weight:700;margin-bottom:1.25rem;">✏️ Modifier la tâche</div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;">
+        <div><label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;">Nom</label><input id="eptName" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;" placeholder="Nom de la tâche"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div><label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;">Début</label><input id="eptStart" type="date" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;">Fin</label><input id="eptEnd" type="date" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;"></div>
+        </div>
+        <div><label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;">Responsable</label><input id="eptResp" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;" placeholder="Nom ou entreprise"></div>
+        <div><label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;">Statut</label>
+          <select id="eptStatus" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;">
+            <option value="à faire">⚪ À faire</option><option value="en cours">🔵 En cours</option><option value="fait">✅ Fait</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="eptPlanningId"><input type="hidden" id="eptTaskId">
+      <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;">
+        <button onclick="document.getElementById('editPlanTaskModal').style.display='none'" style="background:var(--paper2);border:none;border-radius:8px;padding:9px 18px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;">Annuler</button>
+        <button onclick="savePlanTask()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;">💾 Enregistrer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Planning Actions ──
+function importPlanningFile(){ document.getElementById('planningImportInput').click(); }
+
+function handlePlanningImport(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const tasks=parsePlanningCSV(ev.target.result);
+    if(!tasks.length){alert('Aucune tâche trouvée dans ce fichier.\n\nVérifiez que le séparateur est ; ou , et que les colonnes sont : Tâche, Début, Fin, Responsable, Statut');return;}
+    // Normalize: replace null parentId with 0 to survive Firebase (which drops null values)
+    // We use 0 as sentinel for "root" since no task will ever have id===0
+    tasks.forEach(t=>{ if(t.parentId==null) t.parentId=0; });
+    if(!state.plannings)state.plannings=[];
+    const pl={id:Date.now(),name:file.name.replace(/\.[^.]+$/,'').replace(/_/g,' '),tasks};
+    state.plannings.push(pl);
+    state.currentPlanningId=pl.id;
+    autoSave();render();
+    showToast(`✅ ${tasks.length} tâches importées — ${pl.name}`);
+  };
+  reader.readAsText(file,'UTF-8');
+  e.target.value='';
+}
+
+function switchPlanning(id){ state.currentPlanningId=id; render(); }
+
+function togglePlanTask(planningId,taskId){
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  const t=pl.tasks.find(t=>t.id===taskId);if(t){t.collapsed=!t.collapsed;render();}
+}
+
+function updateTaskStatus(planningId,taskId,status){
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  const t=pl.tasks.find(t=>t.id===taskId);if(t){t.status=status;autoSave();render();}
+}
+
+function editPlanTask(planningId,taskId){
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  const t=pl.tasks.find(t=>t.id===taskId);if(!t)return;
+  document.getElementById('eptName').value=t.name;
+  document.getElementById('eptStart').value=t.start||'';
+  document.getElementById('eptEnd').value=t.end||'';
+  document.getElementById('eptResp').value=t.responsible||'';
+  document.getElementById('eptStatus').value=t.status||'à faire';
+  document.getElementById('eptPlanningId').value=planningId;
+  document.getElementById('eptTaskId').value=taskId;
+  document.getElementById('editPlanTaskModal').style.display='flex';
+}
+
+function savePlanTask(){
+  const planningId=parseInt(document.getElementById('eptPlanningId').value);
+  const taskId=parseInt(document.getElementById('eptTaskId').value);
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  const t=pl.tasks.find(t=>t.id===taskId);if(!t)return;
+  t.name=document.getElementById('eptName').value.trim()||t.name;
+  t.start=document.getElementById('eptStart').value;
+  t.end=document.getElementById('eptEnd').value;
+  t.responsible=document.getElementById('eptResp').value.trim();
+  t.status=document.getElementById('eptStatus').value;
+  document.getElementById('editPlanTaskModal').style.display='none';
+  autoSave();render();
+}
+
+function addPlanTask(planningId,parentId){
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  const t={id:Date.now(),name:'Nouvelle tâche',start:'',end:'',responsible:'',status:'à faire',parentId:parentId||0,collapsed:false};
+  pl.tasks.push(t);
+  autoSave();render();
+  setTimeout(()=>editPlanTask(planningId,t.id),80);
+}
+
+function addSubTask(planningId,parentId){ addPlanTask(planningId,parentId); }
+
+function deletePlanTask(planningId,taskId){
+  const pl=state.plannings.find(p=>p.id===planningId);if(!pl)return;
+  if(!confirm('Supprimer cette tâche (et ses sous-tâches) ?'))return;
+  const toDelete=new Set();
+  const collect=(id)=>{toDelete.add(id);pl.tasks.filter(t=>t.parentId===id).forEach(t=>collect(t.id));};
+  collect(taskId);
+  pl.tasks=pl.tasks.filter(t=>!toDelete.has(t.id));
+  autoSave();render();
+}
+
+function deletePlanning(planningId){
+  if(!confirm('Supprimer ce planning entier ?'))return;
+  state.plannings=state.plannings.filter(p=>p.id!==planningId);
+  state.currentPlanningId=state.plannings[0]?.id||null;
+  autoSave();render();
+}
+
+// ════════════════════════════════════════
+//  AI CHAT — CLAUDE ASSISTANT (Tool Use)
+// ════════════════════════════════════════
+var _aiOpen=false;
+var _aiMessages=[];    // display messages
+var _aiApiHistory=[];  // full API conversation history (includes tool blocks)
+var _aiSending=false;
+var _aiShowKey=false;
+
+// ── TOOLS DEFINITION ──
+var _aiTools=[
+  // Built-in Anthropic web search tool
+  {type:'web_search_20250305',name:'web_search'},
+  {
+    name:'add_sous_traitant',
+    description:'Ajoute un nouveau sous-traitant/collaborateur dans le système F Estates.',
+    input_schema:{
+      type:'object',
+      properties:{
+        name:{type:'string',description:'Nom complet'},
+        specialty:{type:'string',description:'Corps de métier / spécialité'},
+        company:{type:'string',description:'Nom de la société'},
+        email:{type:'string',description:'Email'},
+        phone:{type:'string',description:'Numéro de téléphone'}
+      },
+      required:['name']
+    }
+  },
+  {
+    name:'mark_task_done',
+    description:'Marque une tâche de chantier comme faite (done=true) ou à faire (done=false).',
+    input_schema:{
+      type:'object',
+      properties:{
+        chantier_name:{type:'string',description:'Nom du chantier (partiel OK)'},
+        task_name:{type:'string',description:'Nom de la tâche (partiel OK)'},
+        done:{type:'boolean',description:'true=fait, false=à faire'}
+      },
+      required:['chantier_name','task_name','done']
+    }
+  },
+  {
+    name:'update_planning_status',
+    description:'Met à jour le statut d\'une tâche dans un planning CSV importé.',
+    input_schema:{
+      type:'object',
+      properties:{
+        task_name:{type:'string',description:'Nom de la tâche planning (partiel OK)'},
+        status:{type:'string',description:'Nouveau statut: fait | en cours | à faire'}
+      },
+      required:['task_name','status']
+    }
+  },
+  {
+    name:'delete_sous_traitant',
+    description:'Supprime un sous-traitant du système. Utilise l\'id exact si disponible pour éviter les ambiguïtés.',
+    input_schema:{
+      type:'object',
+      properties:{
+        id:{type:'string',description:'ID exact du sous-traitant (visible dans le système prompt, ex: st_1234)'},
+        name:{type:'string',description:'Nom du sous-traitant (utilisé si id non fourni)'}
+      }
+    }
+  },
+  {
+    name:'add_remark',
+    description:'Ajoute une remarque/note à une tâche de chantier.',
+    input_schema:{
+      type:'object',
+      properties:{
+        chantier_name:{type:'string',description:'Nom du chantier (partiel OK)'},
+        task_name:{type:'string',description:'Nom de la tâche (partiel OK)'},
+        remark:{type:'string',description:'Texte de la remarque'}
+      },
+      required:['chantier_name','task_name','remark']
+    }
+  }
+];
+
+// ── TOOL EXECUTION ──
+function _executeTool(name,input){
+  try{
+    if(name==='add_sous_traitant'){
+      if(!state.sousTraitants)state.sousTraitants=[];
+      var st={id:'st_'+Date.now(),name:input.name,specialty:input.specialty||'',company:input.company||'',email:input.email||'',phone:input.phone||''};
+      state.sousTraitants.push(st);
+      autoSave();render();
+      return 'Sous-traitant "'+input.name+'" ajouté avec succès.';
+    }
+    if(name==='delete_sous_traitant'){
+      if(!state.sousTraitants)return'Aucun sous-traitant enregistré.';
+      var target=null;
+      if(input.id){
+        target=state.sousTraitants.find(function(st){return st.id===input.id;});
+        if(!target)return'ID "'+input.id+'" non trouvé.';
+      } else if(input.name){
+        var matches=state.sousTraitants.filter(function(st){return st.name.toLowerCase().includes(input.name.toLowerCase());});
+        if(!matches.length)return'Sous-traitant "'+input.name+'" non trouvé.';
+        if(matches.length>1)return'Plusieurs correspondances: '+matches.map(function(s){return s.name+' [id:'+s.id+']';}).join(', ')+'. Utilise l\'id pour supprimer le bon.';
+        target=matches[0];
+      } else return'Fournis un id ou un nom.';
+      state.sousTraitants=state.sousTraitants.filter(function(st){return st.id!==target.id;});
+      autoSave();render();
+      return'Sous-traitant "'+target.name+'" (id:'+target.id+') supprimé.';
+    }
+    if(name==='mark_task_done'){
+      var ch=(state.chantiers||[]).find(function(c){return c.name.toLowerCase().includes(input.chantier_name.toLowerCase());});
+      if(!ch)return 'Chantier "'+input.chantier_name+'" non trouvé.';
+      var found=false;
+      (ch.phases||[]).forEach(function(ph){(ph.steps||[]).forEach(function(s){if(s.name.toLowerCase().includes(input.task_name.toLowerCase())){s.done=input.done;found=true;}});});
+      if(!found)return 'Tâche "'+input.task_name+'" non trouvée dans ce chantier.';
+      autoSave();render();
+      return 'Tâche "'+input.task_name+'" marquée '+(input.done?'✅ faite':'◻️ à faire')+'.';
+    }
+    if(name==='update_planning_status'){
+      var found2=false;
+      (state.plannings||[]).forEach(function(pl){(pl.tasks||[]).forEach(function(t){if(t.name.toLowerCase().includes(input.task_name.toLowerCase())){t.status=input.status;found2=true;}});});
+      if(!found2)return 'Tâche planning "'+input.task_name+'" non trouvée.';
+      autoSave();render();
+      return 'Statut de "'+input.task_name+'" mis à jour → '+input.status+'.';
+    }
+    if(name==='add_remark'){
+      var ch2=(state.chantiers||[]).find(function(c){return c.name.toLowerCase().includes(input.chantier_name.toLowerCase());});
+      if(!ch2)return 'Chantier "'+input.chantier_name+'" non trouvé.';
+      var found3=false;
+      (ch2.phases||[]).forEach(function(ph){(ph.steps||[]).forEach(function(s){if(s.name.toLowerCase().includes(input.task_name.toLowerCase())){s.remark=(s.remark?s.remark+'\n':'')+input.remark;found3=true;}});});
+      if(!found3)return 'Tâche "'+input.task_name+'" non trouvée.';
+      autoSave();render();
+      return 'Remarque ajoutée à "'+input.task_name+'".';
+    }
+    return 'Outil inconnu: '+name;
+  }catch(e){return 'Erreur: '+e.message;}
+}
+
+function getAiKey(){return localStorage.getItem('fe_claude_key')||'';}
+function deleteAiKey(){
+  localStorage.removeItem('fe_claude_key');
+  document.getElementById('aiKeyInp').value='';
+  _aiMessages=[];_aiApiHistory=[];
+  document.getElementById('aiMsgs').innerHTML='';
+  alert('Clé supprimée. Entrez une nouvelle clé.');
+}
+function saveAiKey(){
+  var k=document.getElementById('aiKeyInp').value.trim();
+  if(!k){alert('Veuillez entrer une clé API valide.');return;}
+  localStorage.setItem('fe_claude_key',k);
+  _aiShowKey=false;
+  document.getElementById('aiKeyBox').style.display='none';
+  document.getElementById('aiMsgs').style.display='flex';
+  document.getElementById('aiFooter').style.display='flex';
+  _addAiMsg('assistant','✅ Clé API enregistrée ! Je peux lire vos données ET effectuer des actions (ajouter des sous-traitants, marquer des tâches, etc.). Comment puis-je vous aider ?');
+}
+
+function initAiChat(){
+  var btn=document.getElementById('aiChatBtn');
+  if(btn)btn.classList.add('shown');
+}
+
+function toggleAiChat(){
+  _aiOpen=!_aiOpen;
+  var panel=document.getElementById('aiChatPanel');
+  if(_aiOpen){
+    panel.classList.add('open');
+    var key=getAiKey();
+    if(!key){
+      _aiShowKey=true;
+      document.getElementById('aiKeyBox').style.display='flex';
+      document.getElementById('aiMsgs').style.display='none';
+      document.getElementById('aiFooter').style.display='none';
+    } else {
+      document.getElementById('aiKeyBox').style.display='none';
+      document.getElementById('aiMsgs').style.display='flex';
+      document.getElementById('aiFooter').style.display='flex';
+      if(_aiMessages.length===0){
+        _aiApiHistory=[];
+        _addAiMsg('greeting','👋 Bonjour ! Je suis votre assistant chantier.\n\nJe peux répondre à vos questions ET effectuer des actions :\n• Ajouter un sous-traitant\n• Marquer une tâche comme faite\n• Mettre à jour un statut de planning\n• Ajouter des remarques\n\nComment puis-je vous aider ?');
+      }
+      setTimeout(()=>document.getElementById('aiInp').focus(),100);
+    }
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function toggleAiSettings(){
+  _aiShowKey=!_aiShowKey;
+  document.getElementById('aiKeyBox').style.display=_aiShowKey?'flex':'none';
+  document.getElementById('aiMsgs').style.display=_aiShowKey?'none':'flex';
+  document.getElementById('aiFooter').style.display=_aiShowKey?'none':'flex';
+  if(_aiShowKey) document.getElementById('aiKeyInp').value=getAiKey();
+}
+
+function _addAiMsg(role,text){
+  _aiMessages.push({role:role,content:text});
+  _renderAiMsgs();
+}
+
+function _renderAiMsgs(){
+  var el=document.getElementById('aiMsgs');
+  if(!el)return;
+  el.innerHTML=_aiMessages.map(function(m){
+    var cls=m.role==='greeting'?'assistant':m.role==='action'?'action':m.role;
+    return '<div class="ai-m '+cls+'">'+escHtml(m.content)+'</div>';
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+function _buildSystemPrompt(){
+  var today=new Date().toLocaleDateString('fr-FR');
+  var lines=[];
+  lines.push('Tu es un assistant de suivi de chantier pour F Estates au Luxembourg.');
+  lines.push('Aujourd\'hui : '+today+'.');
+  lines.push('Réponds dans la même langue que l\'utilisateur (français, allemand ou anglais). Sois concis et précis.');
+  lines.push('Tu as accès à la recherche web : utilise-la pour trouver des entreprises locales (Luxemburg/Lorraine/Grande Région), prix de matériaux, normes de construction, etc.');
+  lines.push('');
+  lines.push('=== CHANTIERS ===');
+  (state.chantiers||[]).forEach(function(ch){
+    var phases=ch.phases||[];
+    var total=0,done=0;
+    phases.forEach(function(ph){(ph.steps||[]).forEach(function(s){total++;if(s.done)done++;});});
+    var pct=total?Math.round(done/total*100):0;
+    lines.push('• '+ch.name+' ('+pct+'% complété, '+done+'/'+total+' tâches)');
+    phases.forEach(function(ph){
+      var pdone=(ph.steps||[]).filter(function(s){return s.done;}).length;
+      lines.push('  Phase "'+ph.name+'": '+pdone+'/'+(ph.steps||[]).length+' tâches');
+    });
+  });
+  lines.push('');
+  lines.push('=== SOUS-TRAITANTS ===');
+  (state.sousTraitants||[]).forEach(function(st,i){
+    lines.push('• [id:'+st.id+'] '+st.name+([st.specialty,st.company].filter(Boolean).length?' ('+[st.specialty,st.company].filter(Boolean).join(', ')+')':'')+(st.email?' <'+st.email+'>':''));
+  });
+  lines.push('');
+  if((state.plannings||[]).length){
+    lines.push('=== PLANNINGS CSV ===');
+    (state.plannings||[]).forEach(function(pl){
+      lines.push('Planning "'+pl.name+'" — '+(pl.tasks||[]).length+' tâches');
+    });
+    var alerts=[];
+    try{alerts=getPlanningAlerts();}catch(e){}
+    if(alerts.length){
+      lines.push('ALERTES PLANNING:');
+      alerts.forEach(function(a){
+        lines.push('  ⚠️ ['+a.type+'] '+a.task.name+' — '+a.planName+(a.days!==undefined?' ('+Math.abs(a.days)+'j)':''));
+      });
+    }
+  }
+  return lines.join('\n');
+}
+
+function aiInputKeydown(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}
+}
+
+async function sendAiMessage(){
+  if(_aiSending)return;
+  var inp=document.getElementById('aiInp');
+  var text=(inp.value||'').trim();
+  if(!text)return;
+  var key=getAiKey();
+  if(!key){toggleAiSettings();return;}
+  inp.value='';
+  // Add to display + API history
+  _aiMessages.push({role:'user',content:text});
+  _aiApiHistory.push({role:'user',content:text});
+  _renderAiMsgs();
+  _aiSending=true;
+  document.getElementById('aiSendBtn').disabled=true;
+  // Show thinking indicator
+  var thinkEl=document.createElement('div');
+  thinkEl.className='ai-m thinking';
+  thinkEl.id='aiThinking';
+  thinkEl.textContent='…';
+  document.getElementById('aiMsgs').appendChild(thinkEl);
+  document.getElementById('aiMsgs').scrollTop=document.getElementById('aiMsgs').scrollHeight;
+  try{
+    await _aiToolLoop(key);
+  }catch(e){
+    var te=document.getElementById('aiThinking');if(te)te.remove();
+    _aiMessages.push({role:'assistant',content:'❌ Erreur: '+e.message});
+  }
+  _aiSending=false;
+  document.getElementById('aiSendBtn').disabled=false;
+  _renderAiMsgs();
+  inp.focus();
+}
+
+async function _aiToolLoop(key){
+  var maxIter=6;
+  for(var i=0;i<maxIter;i++){
+    var result=await _aiStreamRequest(key);
+    var te=document.getElementById('aiThinking');if(te)te.remove();
+    if(result.error){
+      _aiMessages.push({role:'assistant',content:result.error});
+      _renderAiMsgs();
+      return;
+    }
+    // Add full assistant response to API history
+    if(result.content&&result.content.length)
+      _aiApiHistory.push({role:'assistant',content:result.content});
+    // If no tool calls or done → stop
+    if(!result.toolUses||!result.toolUses.length)break;
+    // Execute tools
+    var toolResults=[];
+    result.toolUses.forEach(function(tb){
+      var execRes=_executeTool(tb.name,tb.input);
+      toolResults.push({type:'tool_result',tool_use_id:tb.id,content:execRes});
+      _aiMessages.push({role:'action',content:'⚡ '+execRes});
+    });
+    _aiApiHistory.push({role:'user',content:toolResults});
+    _renderAiMsgs();
+    if(result.stop_reason==='end_turn')break;
+    // Show thinking for next round
+    var nt=document.createElement('div');
+    nt.className='ai-m thinking';nt.id='aiThinking';nt.textContent='…';
+    var ms=document.getElementById('aiMsgs');
+    if(ms){ms.appendChild(nt);ms.scrollTop=ms.scrollHeight;}
+  }
+}
+
+async function _aiStreamRequest(key){
+  var res;
+  try{
+    res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-opus-4-7',
+        max_tokens:1024,
+        system:_buildSystemPrompt(),
+        tools:_aiTools,
+        stream:true,
+        messages:_aiApiHistory
+      })
+    });
+  }catch(e){return{error:'❌ Erreur réseau: '+e.message};}
+
+  if(!res.ok){
+    var errTxt=await res.text().catch(function(){return'';});
+    var msg='Erreur API '+res.status;
+    if(res.status===401)msg='❌ Clé API invalide. Vérifiez votre clé (⚙️).';
+    else try{var ej=JSON.parse(errTxt);msg='Erreur '+res.status+': '+(ej.error&&ej.error.message?ej.error.message:errTxt);}catch(pe){msg='Erreur '+res.status+': '+errTxt;}
+    return{error:msg};
+  }
+
+  var reader=res.body.getReader();
+  var decoder=new TextDecoder();
+  var buf='';
+  var blocks={};          // blockIndex → {type,text?,id?,name?,inputJson?}
+  var textMsgIdx={};      // blockIndex → index in _aiMessages
+  var stop_reason='end_turn';
+
+  function processData(raw){
+    try{
+      var ev=JSON.parse(raw);
+      var idx=ev.index;
+      if(ev.type==='content_block_start'){
+        var cb=ev.content_block;
+        if(cb.type==='text'){
+          blocks[idx]={type:'text',text:''};
+          // Remove thinking dot, create streaming bubble in DOM
+          var te=document.getElementById('aiThinking');if(te)te.remove();
+          _aiMessages.push({role:'assistant',content:''});
+          textMsgIdx[idx]=_aiMessages.length-1;
+          _renderAiMsgs(); // render now so the bubble exists in DOM
+        } else if(cb.type==='tool_use'&&cb.name!=='web_search'){
+          // Custom client-side tool (add_sous_traitant etc.)
+          blocks[idx]={type:'tool_use',id:cb.id,name:cb.name,inputJson:''};
+        } else {
+          // server_tool_use (web_search) or unknown → Anthropic handles server-side, skip
+          blocks[idx]={type:'skip'};
+        }
+      } else if(ev.type==='content_block_delta'){
+        var d=ev.delta;
+        if(!blocks[idx])return;
+        if(blocks[idx].type==='skip')return;
+        if(d.type==='text_delta'&&blocks[idx].type==='text'){
+          blocks[idx].text+=d.text;
+          var mi=textMsgIdx[idx];
+          if(mi!==undefined&&mi<_aiMessages.length){
+            _aiMessages[mi].content=blocks[idx].text;
+            // Live update the bubble directly for perf
+            var el=document.getElementById('aiMsgs');
+            if(el){
+              var bubbles=el.querySelectorAll('.ai-m.assistant');
+              var bub=bubbles[bubbles.length-1];
+              if(bub)bub.textContent=blocks[idx].text;
+              el.scrollTop=el.scrollHeight;
+            }
+          }
+        } else if(d.type==='input_json_delta'&&blocks[idx].type==='tool_use'){
+          blocks[idx].inputJson+=(d.partial_json||'');
+        }
+      } else if(ev.type==='content_block_stop'){
+        if(blocks[idx]&&blocks[idx].type==='tool_use'){
+          try{blocks[idx].input=JSON.parse(blocks[idx].inputJson||'{}');}catch(e){blocks[idx].input={};}
+        }
+      } else if(ev.type==='message_delta'){
+        if(ev.delta&&ev.delta.stop_reason)stop_reason=ev.delta.stop_reason;
+      }
+    }catch(e){}
+  }
+
+  while(true){
+    var chunk=await reader.read();
+    if(chunk.done)break;
+    buf+=decoder.decode(chunk.value,{stream:true});
+    var lines=buf.split('\n');
+    buf=lines.pop();
+    for(var i=0;i<lines.length;i++){
+      var line=lines[i];
+      if(line.startsWith('data: ')){
+        var data=line.slice(6).trim();
+        if(data&&data!=='[DONE]')processData(data);
+      }
+    }
+  }
+
+  // Build content array for API history
+  var content=Object.keys(blocks).sort(function(a,b){return+a-+b;}).map(function(k){
+    var b=blocks[k];
+    if(b.type==='text')return{type:'text',text:b.text};
+    if(b.type==='tool_use')return{type:'tool_use',id:b.id,name:b.name,input:b.input||{}};
+    return null; // skip 'skip' and unknown types
+  }).filter(Boolean);
+
+  var toolUses=content.filter(function(b){return b.type==='tool_use';});
+  return{content,stop_reason,toolUses,error:null};
+}
 </script>
+
+<!-- AI CHAT -->
+<button id="aiChatBtn" onclick="toggleAiChat()" title="Assistant IA">🤖</button>
+<div id="aiChatPanel">
+  <div class="ai-ch-header">
+    <div style="font-size:20px">🤖</div>
+    <div style="flex:1">
+      <div class="ai-ch-title">Assistant IA</div>
+      <div class="ai-ch-sub">Powered by Claude · Votre copilote chantier</div>
+    </div>
+    <button class="ai-ch-setbtn" onclick="toggleAiSettings()">⚙️ Clé API</button>
+    <button class="ai-ch-closebtn" onclick="toggleAiChat()">✕</button>
+  </div>
+  <div class="ai-key-box" id="aiKeyBox" style="display:none;flex-direction:column;">
+    <h3>🔑 Clé API Anthropic</h3>
+    <p>Obtenez votre clé sur <strong>console.anthropic.com</strong><br>→ <em>API Keys</em> → <em>Create Key</em></p>
+    <input type="password" class="ai-key-inp" id="aiKeyInp" placeholder="sk-ant-api03-...">
+    <button class="ai-key-save" onclick="saveAiKey()">Enregistrer la clé</button>
+    <button onclick="deleteAiKey()" style="background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-align:left;">🗑️ Supprimer la clé enregistrée</button>
+    <p style="font-size:11px;color:var(--ink3)">Stockée uniquement dans ce navigateur. Jamais envoyée ailleurs.</p>
+  </div>
+  <div class="ai-msgs" id="aiMsgs" style="display:none"></div>
+  <div class="ai-ch-footer" id="aiFooter" style="display:none">
+    <textarea class="ai-inp" id="aiInp" placeholder="Posez une question sur vos chantiers…" rows="1" onkeydown="aiInputKeydown(event)"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="sendAiMessage()">➤</button>
+  </div>
+</div>
+
 </body></html>

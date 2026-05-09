@@ -1791,7 +1791,7 @@ function renderChecklist(cid,pid){
 //  ACTIONS
 // ════════════════════════════════════════
 function showDashboard(){ state.currentView='dashboard'; state.currentChantierId=null; state.currentPhaseId=null; _filter='all'; render(); }
-function showProject(cid,pid){ state.currentView='project'; state.currentChantierId=cid; state.currentPhaseId=pid; _filter='all'; if(state.currentChantierId!==cid||state.currentPhaseId!==pid) _currentAptId=null; const c=getChantier(cid); if(c) c.expanded=true; render(); }
+function showProject(cid,pid){ const changing=state.currentChantierId!==cid||state.currentPhaseId!==pid; state.currentView='project'; state.currentChantierId=cid; state.currentPhaseId=pid; _filter='all'; if(changing){_currentAptId=null;_showImmeubleTotal=false;} const c=getChantier(cid); if(c) c.expanded=true; render(); }
 function toggleChantier(cid){ const c=getChantier(cid); if(c){ c.expanded=!c.expanded; renderSidebar(); } }
 function setFilter(f,cid,pid){ _filter=f; renderChecklist(cid,pid); }
 
@@ -1877,6 +1877,7 @@ function createCustomPhase(name, stepNames){
 // ════════════════════════════════════════
 let _currentAptId=null; // null = show apt grid, string = show apt detail
 let _aptSelectMode=false;
+let _showImmeubleTotal=false;
 let _selectedApts=new Set(); // selected apt IDs (strings)
 
 function _generateAptNames(baseName, count){
@@ -2058,10 +2059,55 @@ function getAptStepStatus(apt,i){
   return 'blocked';
 }
 
+function renderImmeubleTotal(cid,pid){
+  const ph=getPhase(cid,pid);
+  const apts=ph.appartements||[];
+  let totalDone=0,totalSteps=0;
+  apts.forEach(a=>{totalDone+=a.steps.filter(s=>s.done).length;totalSteps+=a.steps.length;});
+  const pct=totalSteps?Math.round(totalDone/totalSteps*100):0;
+  const rows=apts.map(apt=>{
+    const p=getAptProgress(apt);
+    const col=p.pct===100?'var(--green)':p.pct>0?'var(--accent2)':'var(--paper3)';
+    return `<div style="background:#fff;border:1.5px solid var(--paper3);border-radius:10px;padding:13px 16px;cursor:pointer;transition:all .15s;" onclick="_showImmeubleTotal=false;_currentAptId='${apt.id}';showProject(${cid},${pid})" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--paper3)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">🏠 ${escHtml(apt.name)}</div>
+        <div style="font-size:12px;font-weight:700;color:${col}">${p.pct}%</div>
+      </div>
+      <div style="height:6px;background:var(--paper3);border-radius:3px;margin-bottom:6px">
+        <div style="height:6px;background:${col};border-radius:3px;width:${p.pct}%;transition:width .3s"></div>
+      </div>
+      <div style="font-size:11px;color:var(--ink3)">${p.done}/${p.total} étapes terminées</div>
+    </div>`;
+  }).join('');
+  return `<div class="apt-section">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.2rem">
+      <button class="apt-back-btn" onclick="_showImmeubleTotal=false;showProject(${cid},${pid})">← Tous les appartements</button>
+      <div style="font-size:15px;font-weight:700;color:var(--ink)">🏢 Immeuble total</div>
+    </div>
+    <div style="background:#fff;border:1.5px solid var(--paper3);border-radius:12px;padding:18px 20px;margin-bottom:1.2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink2)">Avancement global — ${apts.length} appartement${apts.length>1?'s':''}</div>
+        <div style="font-size:20px;font-weight:800;color:var(--accent)">${pct}%</div>
+      </div>
+      <div style="height:10px;background:var(--paper3);border-radius:5px;margin-bottom:8px">
+        <div style="height:10px;background:var(--accent);border-radius:5px;width:${pct}%;transition:width .4s"></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink3)">${totalDone} / ${totalSteps} étapes terminées sur l'ensemble de la résidence</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+      ${apts.length?rows:'<p style="font-size:13px;color:var(--ink3)">Aucun appartement créé.</p>'}
+    </div>
+  </div>`;
+}
+
 function renderAptSection(cid,pid){
   const ph=getPhase(cid,pid);
   if(!ph||ph.type!=='apt') return '';
   const apts=ph.appartements||[];
+
+  // Immeuble total overview
+  if(_showImmeubleTotal) return renderImmeubleTotal(cid,pid);
+
   if(_currentAptId&&!_aptSelectMode){
     const apt=apts.find(a=>a.id===_currentAptId);
     if(apt) return renderAptDetail(cid,pid,apt);
@@ -2069,6 +2115,19 @@ function renderAptSection(cid,pid){
   }
   // Grid view
   const selCount=_selectedApts.size;
+
+  // Global progress for Immeuble total card
+  let totalDone=0,totalSteps=0;
+  apts.forEach(a=>{totalDone+=a.steps.filter(s=>s.done).length;totalSteps+=a.steps.length;});
+  const globalPct=totalSteps?Math.round(totalDone/totalSteps*100):0;
+
+  const immeubleCard=apts.length>0&&!_aptSelectMode?`
+    <div class="apt-card" style="border:2px solid var(--accent);background:linear-gradient(135deg,#f0f4ff,#e8ecf8)" onclick="_showImmeubleTotal=true;showProject(${cid},${pid})">
+      <div class="apt-card-name" style="color:var(--accent)">🏢 Immeuble total</div>
+      <div class="apt-card-prog"><div class="apt-card-prog-fill" style="width:${globalPct}%;background:var(--accent)"></div></div>
+      <div class="apt-card-meta" style="color:var(--accent2)">${totalDone}/${totalSteps} étapes · ${globalPct}% · ${apts.length} appt${apts.length>1?'s':''}</div>
+    </div>`:'';
+
   const cards=apts.map(apt=>{
     const p=getAptProgress(apt);
     const isSel=_selectedApts.has(apt.id);
@@ -2112,7 +2171,7 @@ function renderAptSection(cid,pid){
       ${headerBtns}
     </div>
     ${bulkBar}
-    ${apts.length===0?`<div style="font-size:13px;color:var(--ink3);padding:10px 0">Aucun appartement — cliquez sur "＋ Ajouter" pour commencer</div>`:`<div class="apt-grid">${cards}</div>`}
+    ${apts.length===0?`<div style="font-size:13px;color:var(--ink3);padding:10px 0">Aucun appartement — cliquez sur "＋ Ajouter" pour commencer</div>`:`<div class="apt-grid">${immeubleCard}${cards}</div>`}
   </div>`;
 }
 

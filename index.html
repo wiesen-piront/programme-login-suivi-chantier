@@ -782,6 +782,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <div id="adminHeaderBtns" style="display:contents">
       <button class="header-btn" onclick="openProfileModal()" title="Profil entreprise">🏢 Profil</button>
       <button class="header-btn" id="installBtn" onclick="installApp()" style="display:none">📲 Installer</button>
+      <button class="header-btn" onclick="openRapportModal()" style="background:rgba(122,182,72,.18);border-color:rgba(122,182,72,.4);color:#a8d878">📝 Rapport</button>
       <button class="header-btn" onclick="window.print()">🖨 Imprimer</button>
       <button class="header-btn" onclick="exportData()">⬇ Export</button>
       <button class="header-btn" onclick="document.getElementById('importFile').click()">⬆ Import</button>
@@ -5284,6 +5285,127 @@ function saveAiKey(){
   _addAiMsg('assistant','✅ Clé API enregistrée ! Je peux lire vos données ET effectuer des actions (ajouter des sous-traitants, marquer des tâches, etc.). Comment puis-je vous aider ?');
 }
 
+// ═══════════════════════════════════════════
+//  RAPPORT IA
+// ═══════════════════════════════════════════
+function openRapportModal(){
+  // Populate chantier select
+  var sel=document.getElementById('rapportChantier');
+  sel.innerHTML='<option value="">— Tous les chantiers —</option>';
+  state.chantiers.forEach(function(c){
+    var opt=document.createElement('option');
+    opt.value=c.id;
+    opt.textContent=c.name;
+    sel.appendChild(opt);
+  });
+  // Pre-select current chantier if in project view
+  if(state.currentChantierId) sel.value=state.currentChantierId;
+  document.getElementById('rapportOutput').innerHTML='<span style="color:var(--ink3);font-style:italic">Le rapport apparaîtra ici après génération…</span>';
+  document.getElementById('rapportPrintBtn').style.display='none';
+  document.getElementById('rapportModal').style.display='flex';
+  setTimeout(function(){document.getElementById('rapportNotes').focus();},100);
+}
+function closeRapportModal(){
+  document.getElementById('rapportModal').style.display='none';
+}
+
+async function genererRapport(){
+  var key=localStorage.getItem('fe_claude_key');
+  if(!key){showToast('⚠ Clé API Claude manquante — configurez-la dans le chat IA');return;}
+  var type=document.getElementById('rapportType').value;
+  var cid=document.getElementById('rapportChantier').value;
+  var notes=document.getElementById('rapportNotes').value.trim();
+  if(!notes){showToast('⚠ Veuillez entrer vos notes');return;}
+
+  var chantierName='';
+  var chantierInfo='';
+  if(cid){
+    var ch=getChantier(+cid);
+    if(ch){
+      chantierName=ch.name;
+      var totalSteps=0,doneSteps=0;
+      (ch.phases||[]).forEach(function(ph){
+        if(ph.type==='apt'){
+          (ph.appartements||[]).forEach(function(a){totalSteps+=a.steps.length;doneSteps+=a.steps.filter(function(s){return s.done;}).length;});
+        } else {
+          totalSteps+=(ph.steps||[]).length;
+          doneSteps+=(ph.steps||[]).filter(function(s){return s.done;}).length;
+        }
+      });
+      var pct=totalSteps?Math.round(doneSteps/totalSteps*100):0;
+      chantierInfo='Chantier: '+chantierName+' | Avancement: '+pct+'% ('+doneSteps+'/'+totalSteps+' étapes)';
+    }
+  }
+
+  var typeLabels={reunion:'Procès-verbal de réunion de chantier',avancement:'Rapport d\'avancement',reception:'Procès-verbal de réception',incident:'Rapport d\'incident',hebdo:'Rapport hebdomadaire',libre:'Rapport'};
+  var typeLabel=typeLabels[type]||'Rapport';
+
+  var systemPrompt='Tu es un assistant spécialisé dans la rédaction de documents professionnels pour le secteur de la construction au Luxembourg. '+
+    'Tu rédiges des rapports clairs, structurés et professionnels en français, adaptés aux promoteurs immobiliers et chefs de chantier. '+
+    'Utilise des sections bien définies, une mise en forme claire avec des titres, et un ton formel mais lisible. '+
+    'La date du rapport est le '+new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})+'.';
+
+  var userMsg='Génère un '+typeLabel+' professionnel à partir de ces notes:\n\n'+
+    (chantierInfo?chantierInfo+'\n\n':'')+
+    'NOTES:\n'+notes+'\n\n'+
+    'Le rapport doit être complet, bien structuré, prêt à imprimer. Inclus: titre, date, référence chantier, sections claires, points d\'action si pertinent.';
+
+  var btn=document.getElementById('rapportGenBtn');
+  btn.disabled=true; btn.textContent='⏳ Génération en cours…';
+  var out=document.getElementById('rapportOutput');
+  out.textContent='';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-opus-4-7',max_tokens:2048,system:systemPrompt,stream:true,messages:[{role:'user',content:userMsg}]})
+    });
+    var reader=res.body.getReader();var dec=new TextDecoder();var buf='';
+    while(true){
+      var _r=await reader.read();if(_r.done)break;
+      buf+=dec.decode(_r.value,{stream:true});
+      var lines=buf.split('\n');buf=lines.pop();
+      for(var line of lines){
+        if(!line.startsWith('data:'))continue;
+        var d=line.slice(5).trim();if(d==='[DONE]')continue;
+        try{
+          var ev=JSON.parse(d);
+          if(ev.type==='content_block_delta'&&ev.delta?.type==='text_delta'){
+            out.textContent+=ev.delta.text;
+            out.scrollTop=out.scrollHeight;
+          }
+        }catch(e){}
+      }
+    }
+    document.getElementById('rapportPrintBtn').style.display='';
+    showToast('✅ Rapport généré');
+  }catch(e){
+    out.textContent='Erreur: '+e.message;
+    showToast('❌ Erreur de génération');
+  }
+  btn.disabled=false; btn.textContent='✨ Générer avec l\'IA';
+}
+
+function imprimerRapport(){
+  var content=document.getElementById('rapportOutput').textContent;
+  var chantierName=document.getElementById('rapportChantier').options[document.getElementById('rapportChantier').selectedIndex]?.text||'';
+  var w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rapport</title><style>
+    body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 40px;color:#111;line-height:1.7;font-size:13pt;}
+    h1,h2,h3{font-family:'Helvetica Neue',sans-serif;color:#0b1d4d;}
+    h1{font-size:18pt;border-bottom:2px solid #0b1d4d;padding-bottom:8px;}
+    h2{font-size:14pt;margin-top:24px;}
+    h3{font-size:12pt;margin-top:16px;}
+    .footer{margin-top:60px;border-top:1px solid #ccc;padding-top:10px;font-size:9pt;color:#888;text-align:center;}
+    @media print{body{margin:20px;padding:0;}}
+  </style></head><body>
+  <pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:13pt;line-height:1.7">${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+  <div class="footer">F Estates · ${new Date().toLocaleDateString('fr-FR')}${chantierName&&chantierName!=='— Tous les chantiers —'?' · '+chantierName:''}</div>
+  <script>window.onload=function(){window.print();}<\/script></body></html>`);
+  w.document.close();
+}
+
 function initAiChat(){
   var btn=document.getElementById('aiChatBtn');
   if(btn)btn.classList.add('shown');
@@ -5568,6 +5690,67 @@ async function _aiStreamRequest(key){
 </script>
 
 <!-- AI CHAT -->
+<!-- ═══ RAPPORT MODAL ═══ -->
+<div id="rapportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:center;justify-content:center;padding:1rem" onclick="if(event.target===this)closeRapportModal()">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:780px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);overflow:hidden">
+
+    <!-- Header -->
+    <div style="background:var(--accent);padding:18px 24px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff">📝 Générer un rapport</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">Écrivez vos notes — l'IA génère un rapport professionnel</div>
+      </div>
+      <button onclick="closeRapportModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px">×</button>
+    </div>
+
+    <!-- Body -->
+    <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+
+      <!-- Left: input -->
+      <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;border-right:1px solid var(--paper3);overflow-y:auto">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Type de rapport</label>
+          <select id="rapportType" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
+            <option value="reunion">Procès-verbal de réunion de chantier</option>
+            <option value="avancement">Rapport d'avancement</option>
+            <option value="reception">Procès-verbal de réception</option>
+            <option value="incident">Rapport d'incident / problème</option>
+            <option value="hebdo">Rapport hebdomadaire</option>
+            <option value="libre">Rapport libre</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Chantier concerné</label>
+          <select id="rapportChantier" style="width:100%;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
+            <option value="">— Tous les chantiers —</option>
+          </select>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column">
+          <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Vos notes / points à inclure</label>
+          <textarea id="rapportNotes" placeholder="Ex: réunion aujourd'hui avec Dupont, dalle RDC coulée hier, retard menuiseries 2 semaines, prochain jalon semaine prochaine, météo a bloqué gros oeuvre lundi…" style="flex:1;min-height:180px;padding:12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:13px;font-family:inherit;resize:none;line-height:1.6"></textarea>
+        </div>
+        <button onclick="genererRapport()" id="rapportGenBtn" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s">
+          ✨ Générer avec l'IA
+        </button>
+      </div>
+
+      <!-- Right: output -->
+      <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:10px;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase">Rapport généré</label>
+          <button onclick="imprimerRapport()" id="rapportPrintBtn" style="display:none;background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨 Imprimer / PDF</button>
+        </div>
+        <div id="rapportOutput" style="flex:1;min-height:300px;border:1.5px solid var(--paper3);border-radius:8px;padding:16px;font-size:13px;line-height:1.8;color:var(--ink);overflow-y:auto;white-space:pre-wrap;background:#fafbfd">
+          <span style="color:var(--ink3);font-style:italic">Le rapport apparaîtra ici après génération…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rapport print frame -->
+<div id="rapportPrintArea" style="display:none"></div>
+
 <button id="aiChatBtn" onclick="toggleAiChat()" title="Assistant IA">🤖</button>
 <div id="aiChatPanel">
   <div class="ai-ch-header">

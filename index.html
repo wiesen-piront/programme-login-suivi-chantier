@@ -5602,7 +5602,37 @@ function partagerEmail(){
   if(!content.trim()){ showToast('❌ Rapport vide'); return; }
   var meta=_getPhotoRapportMeta();
   var subject=meta.typeLabel+(meta.chantierName?' — '+meta.chantierName:'')+' · '+new Date().toLocaleDateString('fr-FR');
-  window.location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(content);
+  openEmailModal(subject, content);
+}
+
+var _emailModalContent='';
+function openEmailModal(subject, content){
+  _emailModalContent=content||'';
+  document.getElementById('emailSubject').value=subject||'';
+  document.getElementById('emailTo').value='';
+  document.getElementById('emailModal').style.display='flex';
+  setTimeout(function(){ document.getElementById('emailTo').focus(); },100);
+}
+function closeEmailModal(){ document.getElementById('emailModal').style.display='none'; }
+function sendEmailGmail(){
+  var to=document.getElementById('emailTo').value.trim();
+  var subject=document.getElementById('emailSubject').value.trim();
+  var url='https://mail.google.com/mail/?view=cm'+(to?'&to='+encodeURIComponent(to):'')+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_emailModalContent);
+  window.open(url,'_blank');
+  closeEmailModal();
+}
+function sendEmailClient(){
+  var to=document.getElementById('emailTo').value.trim();
+  var subject=document.getElementById('emailSubject').value.trim();
+  window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_emailModalContent.slice(0,1800));
+  closeEmailModal();
+}
+function copyEmailText(){
+  navigator.clipboard.writeText(_emailModalContent).then(function(){
+    showToast('📋 Texte copié !'); closeEmailModal();
+  }).catch(function(){
+    showToast('❌ Copie non supportée');
+  });
 }
 
 // ════════════════════════════════════════
@@ -5668,6 +5698,7 @@ function renderDocumentsView(){
             '<div style="display:flex;gap:6px;flex-shrink:0">'+
               '<button onclick="reprinterDoc(\''+doc.id+'\')" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🖨 PDF</button>'+
               '<button onclick="whatsappDoc(\''+doc.id+'\')" style="background:#25d366;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📱</button>'+
+              '<button onclick="emailDoc(\''+doc.id+'\')" style="background:#555;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✉️</button>'+
               '<button onclick="deleteDoc(\''+doc.id+'\')" style="background:#fdecea;color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit">🗑</button>'+
             '</div>'+
           '</div>'+
@@ -5698,6 +5729,11 @@ function reprinterDoc(id){
 function whatsappDoc(id){
   var doc=_getDocById(id); if(!doc)return;
   window.open('https://wa.me/?text='+encodeURIComponent(doc.content||''),'_blank');
+}
+function emailDoc(id){
+  var doc=_getDocById(id); if(!doc)return;
+  var subject=(doc.typeLabel||'Rapport')+(doc.chantierName?' — '+doc.chantierName:'')+' · '+new Date(doc.date).toLocaleDateString('fr-FR');
+  openEmailModal(subject, doc.content||'');
 }
 
 function deleteDoc(id){
@@ -6047,6 +6083,37 @@ async function _aiStreamRequest(key){
   return{content,stop_reason,toolUses,error:null};
 }
 </script>
+
+<!-- ═══ EMAIL MODAL ═══ -->
+<div id="emailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1100;align-items:center;justify-content:center;padding:1rem" onclick="if(event.target===this)closeEmailModal()">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:420px;box-shadow:0 16px 60px rgba(0,0,0,.25);overflow:hidden">
+    <div style="background:var(--accent);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:15px;font-weight:700;color:#fff">✉️ Envoyer par e-mail</div>
+      <button onclick="closeEmailModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Destinataire</label>
+        <input type="email" id="emailTo" placeholder="adresse@email.com" style="width:100%;padding:10px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Objet</label>
+        <input type="text" id="emailSubject" style="width:100%;padding:10px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="sendEmailGmail()" style="background:#EA4335;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          🌐 Ouvrir dans Gmail (navigateur)
+        </button>
+        <button onclick="sendEmailClient()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          📧 Ouvrir dans l'app mail
+        </button>
+        <button onclick="copyEmailText()" style="background:var(--paper);color:var(--ink);border:1.5px solid var(--paper3);border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          📋 Copier le texte
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ PHOTO RAPPORT OVERLAY ═══ -->
 <div id="photoRapportOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:center;justify-content:center;padding:1rem" onclick="if(event.target===this)closePhotoRapport()">

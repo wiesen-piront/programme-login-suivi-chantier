@@ -3593,10 +3593,12 @@ function saveSTEdit(){
   openSTManage();
 }
 function deleteSTConfirm(id){
-  if(!confirm('Supprimer ce sous-traitant ?'))return;
+  const st=state.sousTraitants.find(s=>s.id===id);
+  if(!st)return;
   state.sousTraitants=state.sousTraitants.filter(s=>s.id!==id);
   state.chantiers.forEach(c=>c.phases.forEach(ph=>ph.steps.forEach(s=>{s.assignedSTs=(s.assignedSTs||[]).filter(sid=>sid!==id);})));
-  closeModal('stEditModal');autoSave();render();showToast('🗑 Supprimé');
+  closeModal('stEditModal');autoSave();render();
+  showToast('🗑 '+st.name+' supprimé');
   openSTManage();
 }
 

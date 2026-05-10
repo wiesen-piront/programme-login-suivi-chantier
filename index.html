@@ -5542,7 +5542,7 @@ async function analyserPhoto(){
   var typeLabels={defaut:'constat général',malfacon:'rapport de malfaçon / défaut',avancement:'rapport d\'avancement des travaux',securite:'rapport de sécurité chantier',reception:'procès-verbal de contrôle / réception'};
   var dateStr=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 
-  var systemPrompt='Tu es un expert en inspection de chantiers de construction. Tu rédiges des rapports professionnels courts et directs en français. RÈGLES STRICTES: 1) Max 250 mots. 2) Pas de tableaux. 3) Pas de sections vides. 4) Pas de [À compléter]. 5) Uniquement ce qui est visible sur les photos et dans les notes. 6) Format: titre court, date, puis 2-3 paragraphes.';
+  var systemPrompt='Tu es un expert en inspection de chantiers de construction. Tu rédiges des rapports professionnels courts et directs en français. RÈGLES STRICTES: 1) Max 250 mots. 2) Pas de tableaux. 3) Pas de sections vides. 4) Pas de [À compléter]. 5) Uniquement ce qui est visible sur les photos et dans les notes. 6) PAS de Markdown: pas de **, pas de ##, pas de *, pas de ---, texte brut uniquement. 7) Format: titre court en majuscules, date sur la ligne suivante, puis 2-3 paragraphes.';
   var userText='Rédige un '+(typeLabels[type]||'constat général')+' basé sur '+(+_photoRapportArr.length>1?'ces '+_photoRapportArr.length+' photos':'cette photo')+' de chantier.\nDate: '+dateStr+(chantierName?'\nChantier: '+chantierName:'')+(notes?'\nObservations: '+notes:'');
 
   // Build content array with all images
@@ -5602,16 +5602,35 @@ function partagerEmail(){
   if(!content.trim()){ showToast('❌ Rapport vide'); return; }
   var meta=_getPhotoRapportMeta();
   var subject=meta.typeLabel+(meta.chantierName?' — '+meta.chantierName:'')+' · '+new Date().toLocaleDateString('fr-FR');
-  openEmailModal(subject, content);
+  openEmailModal(subject, content, _photoRapportArr.slice());
 }
 
 var _emailModalContent='';
-function openEmailModal(subject, content){
+var _emailModalPhotos=[];
+function openEmailModal(subject, content, photos){
   _emailModalContent=content||'';
+  _emailModalPhotos=photos||[];
   document.getElementById('emailSubject').value=subject||'';
   document.getElementById('emailTo').value='';
+  // Show/hide photo download section
+  var photoWrap=document.getElementById('emailPhotoDownload');
+  if(photoWrap){
+    if(_emailModalPhotos.length){
+      photoWrap.style.display='';
+      photoWrap.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">📎 Photos à joindre manuellement</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+
+        _emailModalPhotos.map(function(src,i){
+          return '<button onclick="_downloadEmailPhoto('+i+')" style="background:#f0e8ff;color:#7b2ff7;border:1px solid #c3b0f0;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit">⬇ Photo '+(i+1)+'</button>';
+        }).join('')+
+        '<span style="font-size:11px;color:var(--ink3);margin-left:4px">→ à joindre dans le mail</span></div>';
+    } else { photoWrap.style.display='none'; }
+  }
   document.getElementById('emailModal').style.display='flex';
   setTimeout(function(){ document.getElementById('emailTo').focus(); },100);
+}
+function _downloadEmailPhoto(i){
+  var src=_emailModalPhotos[i]; if(!src)return;
+  var a=document.createElement('a'); a.href=src; a.download='photo_rapport_'+(i+1)+'.jpg'; a.click();
 }
 function closeEmailModal(){ document.getElementById('emailModal').style.display='none'; }
 function sendEmailGmail(){
@@ -6100,6 +6119,7 @@ async function _aiStreamRequest(key){
         <label style="font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:6px">Objet</label>
         <input type="text" id="emailSubject" style="width:100%;padding:10px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box">
       </div>
+      <div id="emailPhotoDownload" style="display:none;background:#faf6ff;border:1px solid #e0d5f5;border-radius:8px;padding:10px 12px"></div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <button onclick="sendEmailGmail()" style="background:#EA4335;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           🌐 Ouvrir dans Gmail (navigateur)

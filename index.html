@@ -5436,28 +5436,82 @@ async function genererRapport(){
   btn.disabled=false; btn.textContent='✨ Générer avec l\'IA';
 }
 
+// ── Shared professional PDF generator ──
+function _buildProfessionalPdf({title, subtitle, chantierName, dateStr, content, photos, typeLabel}){
+  var logo=state.profile&&state.profile.logo?state.profile.logo:'';
+  var company=state.profile&&state.profile.companyName?state.profile.companyName:'F Estates';
+  var logoHtml=logo
+    ?'<img src="'+logo+'" style="height:52px;max-width:180px;object-fit:contain" alt="Logo">'
+    :'<div style="font-size:22px;font-weight:800;color:#0b1d4d;letter-spacing:-0.5px">'+escHtml(company)+'</div>';
+  var photosHtml='';
+  if(photos&&photos.length){
+    var imgs=photos.map(function(src){return'<div class="ph-block"><img src="'+src+'" alt="Photo chantier"></div>';}).join('');
+    photosHtml='<div class="ph-grid'+(photos.length===1?' single':'')+'">'+imgs+'</div>';
+  }
+  var bodyText=content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>'+escHtml(title)+'</title><style>'+
+    '*{margin:0;padding:0;box-sizing:border-box;}'+
+    'body{font-family:Georgia,serif;font-size:11pt;color:#1a1a1a;background:#f4f4f4;padding:30px 20px;}'+
+    '.page{max-width:800px;margin:0 auto;background:#fff;box-shadow:0 4px 32px rgba(0,0,0,.12);}'+
+    '.doc-header{display:flex;align-items:center;justify-content:space-between;padding:28px 40px 22px;border-bottom:3px solid #0b1d4d;background:#fff;}'+
+    '.doc-header-right{text-align:right;}'+
+    '.doc-type{font-size:8pt;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:4px;}'+
+    '.doc-title{font-size:18pt;font-weight:bold;color:#0b1d4d;margin-bottom:4px;}'+
+    '.doc-date{font-size:10pt;color:#555;}'+
+    '.doc-meta{background:#0b1d4d;padding:14px 40px;display:flex;gap:32px;flex-wrap:wrap;}'+
+    '.doc-meta-item{color:rgba(255,255,255,.7);font-size:9pt;}'+
+    '.doc-meta-item strong{color:#fff;display:block;font-size:10pt;margin-bottom:2px;}'+
+    '.ph-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:24px 40px;background:#f8f9fc;border-bottom:1px solid #e8eaf0;}'+
+    '.ph-grid.single{justify-content:flex-start;}'+
+    '.ph-block img{max-height:240px;max-width:100%;border-radius:8px;border:1px solid #dde3ef;box-shadow:0 2px 8px rgba(0,0,0,.1);}'+
+    '.doc-body{padding:30px 40px 40px;}'+
+    '.doc-body pre{white-space:pre-wrap;font-family:Georgia,serif;font-size:11.5pt;line-height:1.85;color:#1a1a1a;}'+
+    '.doc-footer{margin:0 40px;padding:16px 0;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:8.5pt;color:#aaa;}'+
+    '.print-btn{display:block;margin:20px auto 0;background:#0b1d4d;color:#fff;border:none;border-radius:8px;padding:12px 32px;font-size:13px;cursor:pointer;font-family:Georgia,serif;letter-spacing:.5px;}'+
+    '@media print{body{background:white;padding:0;}.page{box-shadow:none;}.print-btn{display:none;}}'+
+  '</style></head><body>'+
+  '<div class="page">'+
+    '<div class="doc-header">'+
+      '<div>'+logoHtml+'</div>'+
+      '<div class="doc-header-right">'+
+        '<div class="doc-type">Rapport de chantier</div>'+
+        '<div class="doc-title">'+escHtml(title)+'</div>'+
+        '<div class="doc-date">'+escHtml(dateStr||new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}))+'</div>'+
+      '</div>'+
+    '</div>'+
+    (chantierName||typeLabel?
+      '<div class="doc-meta">'+
+        (typeLabel?'<div class="doc-meta-item"><strong>Type</strong>'+escHtml(typeLabel)+'</div>':'')+
+        (chantierName?'<div class="doc-meta-item"><strong>Chantier</strong>'+escHtml(chantierName)+'</div>':'')+
+        '<div class="doc-meta-item"><strong>Établi par</strong>'+escHtml(company)+'</div>'+
+      '</div>':'')+
+    photosHtml+
+    '<div class="doc-body"><pre>'+bodyText+'</pre></div>'+
+    '<div class="doc-footer">'+
+      '<span>'+escHtml(company)+'</span>'+
+      '<span>'+escHtml(title)+' · '+escHtml(dateStr||new Date().toLocaleDateString('fr-FR'))+'</span>'+
+      '<span>Page 1/1</span>'+
+    '</div>'+
+  '</div>'+
+  '<button class="print-btn" onclick="window.print()">🖨 Imprimer / Enregistrer en PDF</button>'+
+  '</body></html>';
+}
+
+function _openPdfWindow(html, title){
+  var w=window.open('','_blank');
+  if(!w){ showToast('❌ Popup bloqué — autorisez les popups'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
 function imprimerRapport(){
   var content=document.getElementById('rapportOutput').textContent;
   var typeLabel=document.getElementById('rapportType').options[document.getElementById('rapportType').selectedIndex]?.text||'Rapport';
   var chantierName=document.getElementById('rapportChantier').options[document.getElementById('rapportChantier').selectedIndex]?.text||'';
   if(chantierName==='— Tous les chantiers —') chantierName='';
   _saveDocument({type:'rapport',typeLabel:typeLabel,chantierName:chantierName,content:content,photos:[]});
-  var w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rapport</title><style>
-    body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 40px;color:#111;line-height:1.7;font-size:13pt;}
-    h1,h2,h3{font-family:'Helvetica Neue',sans-serif;color:#0b1d4d;}
-    h1{font-size:18pt;border-bottom:2px solid #0b1d4d;padding-bottom:8px;}
-    h2{font-size:14pt;margin-top:24px;}
-    h3{font-size:12pt;margin-top:16px;}
-    .footer{margin-top:60px;border-top:1px solid #ccc;padding-top:10px;font-size:9pt;color:#888;text-align:center;}
-    .print-btn{background:#0b1d4d;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;cursor:pointer;margin-bottom:24px;font-family:Georgia,serif;}
-    @media print{.print-btn{display:none;}body{margin:20px;padding:0;}}
-  </style></head><body>
-  <button class="print-btn" onclick="window.print()">🖨 Imprimer / Enregistrer PDF</button>
-  <pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:13pt;line-height:1.7">${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
-  <div class="footer">F Estates · ${new Date().toLocaleDateString('fr-FR')}${chantierName&&chantierName!=='— Tous les chantiers —'?' · '+chantierName:''}</div>
-  </body></html>`);
-  w.document.close();
+  var dateStr=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  _openPdfWindow(_buildProfessionalPdf({title:typeLabel,chantierName:chantierName,dateStr:dateStr,content:content,photos:[],typeLabel:typeLabel}));
 }
 
 // ════════════════════════════════════════
@@ -5602,9 +5656,8 @@ function imprimerPhotoRapport(){
   // Print
   var photosHtml=_photoRapportArr.map(function(src){ return '<div class="photo-block"><img src="'+src+'"></div>'; }).join('');
   var w=window.open('','_blank');
-  var printCss='body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 40px;color:#111;line-height:1.7;font-size:12pt;}.print-btn{background:#0b1d4d;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;cursor:pointer;margin-bottom:20px;font-family:Georgia,serif;}.photo-block{text-align:center;margin:16px 0;}.photo-block img{max-width:100%;max-height:280px;border-radius:8px;border:1px solid #ddd;}.photo-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0;}.photo-grid .photo-block{margin:0;}.footer{margin-top:60px;border-top:1px solid #ccc;padding-top:10px;font-size:9pt;color:#888;text-align:center;}@media print{.print-btn{display:none;}body{margin:20px;padding:0;}}';
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rapport Photo</title><style>'+printCss+'</style></head><body><button class="print-btn" onclick="window.print()">🖨 Imprimer / Enregistrer PDF</button>'+(+_photoRapportArr.length>1?'<div class="photo-grid">'+photosHtml+'</div>':photosHtml)+'<pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:12pt;line-height:1.7">'+content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre><div class="footer">F Estates · '+meta.typeLabel+' · '+new Date().toLocaleDateString('fr-FR')+(meta.chantierName?' · '+meta.chantierName:'')+'</div></body></html>');
-  w.document.close();
+  var dateStr=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  _openPdfWindow(_buildProfessionalPdf({title:meta.typeLabel,chantierName:meta.chantierName,dateStr:dateStr,content:content,photos:_photoRapportArr.slice(),typeLabel:meta.typeLabel}));
 }
 
 function partagerWhatsApp(){
@@ -5758,12 +5811,9 @@ function _getDocById(id){ return (state.documents||[]).find(function(d){return d
 function reprinterDoc(id){
   var doc=_getDocById(id); if(!doc)return;
   var photos=doc.photoUrls||[];
-  var photosHtml=photos.map(function(src){ return '<div class="photo-block"><img src="'+src+'"></div>'; }).join('');
   var content=doc.content||'';
-  var w=window.open('','_blank');
-  var printCss2='body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 40px;color:#111;line-height:1.7;font-size:12pt;}.print-btn{background:#0b1d4d;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;cursor:pointer;margin-bottom:20px;font-family:Georgia,serif;}.photo-block{text-align:center;margin:16px 0;}.photo-block img{max-width:100%;max-height:280px;border-radius:8px;border:1px solid #ddd;}.photo-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0;}.footer{margin-top:60px;border-top:1px solid #ccc;padding-top:10px;font-size:9pt;color:#888;text-align:center;}@media print{.print-btn{display:none;}body{margin:20px;padding:0;}}';
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+doc.typeLabel+'</title><style>'+printCss2+'</style></head><body><button class="print-btn" onclick="window.print()">🖨 Imprimer / Enregistrer PDF</button>'+(photos.length>1?'<div class="photo-grid">'+photosHtml+'</div>':photosHtml)+'<pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:12pt;line-height:1.7">'+content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre><div class="footer">F Estates · '+escHtml(doc.typeLabel)+(doc.chantierName?' · '+escHtml(doc.chantierName):'')+' · '+new Date(doc.date).toLocaleDateString('fr-FR')+'</div></body></html>');
-  w.document.close();
+  var dateStr=new Date(doc.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  _openPdfWindow(_buildProfessionalPdf({title:doc.typeLabel,chantierName:doc.chantierName,dateStr:dateStr,content:content,photos:photos,typeLabel:doc.typeLabel}));
 }
 
 function whatsappDoc(id){

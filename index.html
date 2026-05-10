@@ -4008,6 +4008,16 @@ function render(){ updateHeaderLogo(); renderSidebar(); if(state.currentView==='
 // Modal close handlers
 ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(id=>{ document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
 document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// Escape key: close all overlays — safety net if anything gets stuck
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(closeModal);
+  closePhotoRapport();
+  closeEmailModal();
+  closeRapportModal();
+  var ro=document.getElementById('rapportModal'); if(ro) ro.style.display='none';
+});
 document.addEventListener('click',e=>{
   if(!e.target.closest('#mailPopover')&&!e.target.closest('.st-chip-btn.mail')&&!e.target.closest('.photo-send-btn')) closeMailPopover();
 });
@@ -5640,16 +5650,18 @@ function sendEmailGmail(){
   var to=document.getElementById('emailTo').value.trim();
   var subject=document.getElementById('emailSubject').value.trim();
   var url='https://mail.google.com/mail/?view=cm'+(to?'&to='+encodeURIComponent(to):'')+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_emailModalContent);
-  window.open(url,'_blank');
   closeEmailModal();
+  setTimeout(function(){ window.open(url,'_blank'); }, 50);
 }
 function sendEmailClient(){
   var to=document.getElementById('emailTo').value.trim();
   var subject=document.getElementById('emailSubject').value.trim();
-  var a=document.createElement('a');
-  a.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_emailModalContent.slice(0,1800));
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   closeEmailModal();
+  setTimeout(function(){
+    var a=document.createElement('a');
+    a.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_emailModalContent.slice(0,1800));
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }, 50);
 }
 function copyEmailText(){
   navigator.clipboard.writeText(_emailModalContent).then(function(){

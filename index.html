@@ -3279,69 +3279,14 @@ async function viewPlan(cid,idx){
     img.onload=()=>{_fitToContainer();renderPins(cid,idx);_initPanZoom();};
     if(img.complete&&img.naturalWidth){setTimeout(()=>{_fitToContainer();renderPins(cid,idx);_initPanZoom();},50);}
   } else if(plan.type==='application/pdf'||plan.name?.toLowerCase().endsWith('.pdf')){
-    // PDF → render with PDF.js
-    if(typeof pdfjsLib==='undefined'){
-      // PDF.js not yet loaded — show in iframe as fallback
-      ann.style.display='none'; frame.style.display=''; frame.src=fileUrl;
-      showToast('⚠ Visionneuse PDF basique — rechargez pour activer les pins');
-      return;
-    }
-    _activateAnnViewer();
-    pdfNav.style.display='flex';
-    _pdfCid=cid; _pdfPlanIdx=idx;
-    // Show loading state
-    const img=document.getElementById('planAnnImg');
-    img.src=''; img.style.width='100%';
-    const wrap=document.getElementById('planAnnImgWrap');
-    if(wrap) wrap.innerHTML='<div id="planAnnImg" style="display:none"></div><div id="pdfLoadingMsg" style="color:#888;font-size:14px;text-align:center;padding:40px;width:100%">⏳ Chargement du PDF… (peut prendre quelques secondes)</div>';
-    try{
-      // Load PDF as bytes — always pass {data:Uint8Array} to PDF.js (avoids all CORS issues)
-      let pdfSrc;
-      // 1. Try IndexedDB first (fastest, no network, no CORS)
-      const localData = await _idbGet(plan.id);
-      if(localData){
-        if(localData.startsWith('data:')){
-          const b64=localData.split(',')[1];
-          const bin=atob(b64);
-          const bytes=new Uint8Array(bin.length);
-          for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-          pdfSrc={data:bytes};
-        } else {
-          pdfSrc={url:localData,withCredentials:false}; // blob URL
-        }
-      } else if(plan.storageUrl && window._stGetBytes){
-        // 2. Firebase Storage SDK — handles auth, no CORS preflight
-        try{
-          const storagePath=_stPlanPath(plan.id);
-          const bytes=await window._stGetBytes(storagePath);
-          pdfSrc={data:bytes};
-        }catch(sdkErr){
-          console.warn('Storage SDK fallback to URL',sdkErr);
-          pdfSrc={url:plan.storageUrl,withCredentials:false};
-        }
-      } else if(fileUrl){
-        // 3. Last resort: use whatever URL we have
-        pdfSrc={url:fileUrl,withCredentials:false};
-      } else {
-        throw new Error('Fichier PDF introuvable — veuillez le re-téléverser');
-      }
-      _pdfDoc=await pdfjsLib.getDocument(pdfSrc).promise;
-      _pdfTotalPages=_pdfDoc.numPages;
-      _pdfPageNum=1;
-      // Restore img element (was replaced by loading msg)
-      const loadWrap=document.getElementById('planAnnImgWrap');
-      if(loadWrap&&!document.getElementById('planAnnImg')){
-        loadWrap.innerHTML='<img class="plan-ann-img" id="planAnnImg" src="" alt="" draggable="false">';
-      }
-      const ldMsg=document.getElementById('pdfLoadingMsg');
-      if(ldMsg) ldMsg.remove();
-      await _renderPdfPage(1,cid,idx);
-      showToast('✅ '+_pdfTotalPages+' page'+(+_pdfTotalPages>1?'s':''));
-    }catch(err){
-      const loadWrap=document.getElementById('planAnnImgWrap');
-      if(loadWrap) loadWrap.innerHTML='<div id="planAnnImg" style="display:none"></div><div style="color:#c00;padding:32px;text-align:center;width:100%">❌ Erreur PDF: '+escHtml(err.message)+'<br><small>Essayez de re-téléverser le fichier</small></div>';
-      console.error('PDF.js error',err);
-    }
+    // PDF → show in iframe (no pins for PDFs)
+    ann.style.display='none';
+    frame.style.display='';
+    annBtn.style.display='none'; annHint.style.display='none';
+    zoomBtns.style.display='none';
+    pdfNav.style.display='none';
+    printBtn.style.display='none';
+    frame.src=fileUrl;
   } else {
     ann.style.display='none';
     frame.style.display='';

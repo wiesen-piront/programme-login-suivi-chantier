@@ -727,12 +727,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getStorage, ref as sRef, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getStorage, ref as sRef, uploadString, getDownloadURL, deleteObject, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
   const firebaseConfig={apiKey:"AIzaSyAunYOcn1sVJkS3UlBuOJsD1NS1ZPzk34o",authDomain:"chantier-98c12.firebaseapp.com",databaseURL:"https://chantier-98c12-default-rtdb.europe-west1.firebasedatabase.app",projectId:"chantier-98c12",storageBucket:"chantier-98c12.firebasestorage.app",messagingSenderId:"108133717293",appId:"1:108133717293:web:ea39231135d380ec766fa4"};
   const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
   const storage=getStorage(app);
   window._stUpload=(path,dataUrl,mime)=>uploadString(sRef(storage,path),dataUrl,'data_url',{contentType:mime});
   window._stUrl=(path)=>getDownloadURL(sRef(storage,path));
+  window._stGetBytes=(path)=>getBytes(sRef(storage,path)); // returns Uint8Array, no CORS issue
   window._stDelete=(path)=>deleteObject(sRef(storage,path)).catch(()=>{});
   window._fbSet=(path,data)=>set(ref(db,path),data);
   window._fbGet=(path)=>get(ref(db,path)).then(snap=>snap.val());
@@ -3294,26 +3295,35 @@ async function viewPlan(cid,idx){
     const wrap=document.getElementById('planAnnImgWrap');
     if(wrap) wrap.innerHTML='<div id="planAnnImg" style="display:none"></div><div id="pdfLoadingMsg" style="color:#888;font-size:14px;text-align:center;padding:40px;width:100%">⏳ Chargement du PDF… (peut prendre quelques secondes)</div>';
     try{
-      // Always convert to Uint8Array to avoid CORS issues with Firebase Storage URLs
+      // Load PDF as bytes — always pass {data:Uint8Array} to PDF.js (avoids all CORS issues)
       let pdfSrc;
-      if(fileUrl.startsWith('data:')){
-        // data URL → Uint8Array
-        const b64=fileUrl.split(',')[1];
-        const bin=atob(b64);
-        const bytes=new Uint8Array(bin.length);
-        for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-        pdfSrc={data:bytes};
-      } else {
-        // blob: or https: — fetch ourselves to bypass CORS, then pass bytes
-        try{
-          const resp=await fetch(fileUrl);
-          if(!resp.ok) throw new Error('HTTP '+resp.status);
-          const buf=await resp.arrayBuffer();
-          pdfSrc={data:new Uint8Array(buf)};
-        }catch(fetchErr){
-          // Fallback: let PDF.js try directly
-          pdfSrc={url:fileUrl,withCredentials:false};
+      // 1. Try IndexedDB first (fastest, no network, no CORS)
+      const localData = await _idbGet(plan.id);
+      if(localData){
+        if(localData.startsWith('data:')){
+          const b64=localData.split(',')[1];
+          const bin=atob(b64);
+          const bytes=new Uint8Array(bin.length);
+          for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+          pdfSrc={data:bytes};
+        } else {
+          pdfSrc={url:localData,withCredentials:false}; // blob URL
         }
+      } else if(plan.storageUrl && window._stGetBytes){
+        // 2. Firebase Storage SDK — handles auth, no CORS preflight
+        try{
+          const storagePath=_stPlanPath(plan.id);
+          const bytes=await window._stGetBytes(storagePath);
+          pdfSrc={data:bytes};
+        }catch(sdkErr){
+          console.warn('Storage SDK fallback to URL',sdkErr);
+          pdfSrc={url:plan.storageUrl,withCredentials:false};
+        }
+      } else if(fileUrl){
+        // 3. Last resort: use whatever URL we have
+        pdfSrc={url:fileUrl,withCredentials:false};
+      } else {
+        throw new Error('Fichier PDF introuvable — veuillez le re-téléverser');
       }
       _pdfDoc=await pdfjsLib.getDocument(pdfSrc).promise;
       _pdfTotalPages=_pdfDoc.numPages;

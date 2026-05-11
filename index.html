@@ -3294,17 +3294,26 @@ async function viewPlan(cid,idx){
     const wrap=document.getElementById('planAnnImgWrap');
     if(wrap) wrap.innerHTML='<div id="planAnnImg" style="display:none"></div><div id="pdfLoadingMsg" style="color:#888;font-size:14px;text-align:center;padding:40px;width:100%">⏳ Chargement du PDF… (peut prendre quelques secondes)</div>';
     try{
-      // Build PDF source — prefer Storage URL (avoids re-encoding); else use local data
+      // Always convert to Uint8Array to avoid CORS issues with Firebase Storage URLs
       let pdfSrc;
-      if(fileUrl.startsWith('blob:')||fileUrl.startsWith('http')){
-        pdfSrc={url:fileUrl,withCredentials:false};
-      } else {
-        // data URL → Uint8Array (more reliable for PDF.js)
+      if(fileUrl.startsWith('data:')){
+        // data URL → Uint8Array
         const b64=fileUrl.split(',')[1];
         const bin=atob(b64);
         const bytes=new Uint8Array(bin.length);
         for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
         pdfSrc={data:bytes};
+      } else {
+        // blob: or https: — fetch ourselves to bypass CORS, then pass bytes
+        try{
+          const resp=await fetch(fileUrl);
+          if(!resp.ok) throw new Error('HTTP '+resp.status);
+          const buf=await resp.arrayBuffer();
+          pdfSrc={data:new Uint8Array(buf)};
+        }catch(fetchErr){
+          // Fallback: let PDF.js try directly
+          pdfSrc={url:fileUrl,withCredentials:false};
+        }
       }
       _pdfDoc=await pdfjsLib.getDocument(pdfSrc).promise;
       _pdfTotalPages=_pdfDoc.numPages;

@@ -3985,9 +3985,9 @@ async function saveSTAccount(){
       if(!password||password.length<6){showToast('⚠ Mot de passe: min. 6 caractères');btn.disabled=false;btn.textContent='Créer le compte';return;}
       showToast('⏳ Création du compte…');
       const workerUid=await window._fbCreateWorkerAccount(email,password);
-      // Register in workerMap so the ST can log in
-      const workerEntry={adminUid:_adminUid||_uid,name:st.name,email,allowedChantiers:[],isSousTraitant:true,stId,createdAt:Date.now()};
-      await window._fbSet('workers/'+(_adminUid||_uid)+'/'+workerUid,workerEntry);
+      // Register under admin's workers path (same as regular workers) + workerMap for login detection
+      const workerEntry={adminUid:_uid,name:st.name,email,allowedChantiers:[],isSousTraitant:true,stId,createdAt:Date.now()};
+      await window._fbSet(_adminWorkersPath()+'/'+workerUid,workerEntry);
       await window._fbSet('workerMap/'+workerUid,workerEntry);
       // Save UID to sous-traitant record
       const idx=state.sousTraitants.findIndex(s=>s.id===stId);

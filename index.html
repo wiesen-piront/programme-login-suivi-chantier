@@ -1010,7 +1010,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <h3 id="stAccountTitle">🔑 Créer un accès app</h3>
     <input type="hidden" id="stAccountStId">
     <p id="stAccountDesc" style="font-size:13px;color:var(--ink3);margin:0 0 12px">Ce sous-traitant pourra se connecter et voir ses pins privés assignés.</p>
-    <label>E-mail de connexion *</label>
+    <label>E-mail de connexion * <span id="stAccountEmailHint" style="font-weight:400;font-size:11px;color:var(--ink3)">(repris depuis la fiche)</span></label>
     <input type="email" id="stAccountEmail" placeholder="ex. martin@dupont.ch">
     <div id="stAccountPwRow">
       <label>Mot de passe *</label>
@@ -3945,7 +3945,11 @@ function openSTAccountModal(stId){
   if(!st)return;
   closeModal('stManageModal');
   document.getElementById('stAccountStId').value=stId;
-  document.getElementById('stAccountEmail').value=st.email||'';
+  const emailInput=document.getElementById('stAccountEmail');
+  emailInput.value=st.email||'';
+  // If ST has no email saved, show hint to enter one
+  const emailHint=document.getElementById('stAccountEmailHint');
+  if(emailHint) emailHint.textContent=st.email?'(repris depuis la fiche)':'(aucun e-mail dans la fiche — à saisir manuellement)';
   document.getElementById('stAccountPassword').value='';
   const existing=document.getElementById('stAccountExisting');
   const pwRow=document.getElementById('stAccountPwRow');

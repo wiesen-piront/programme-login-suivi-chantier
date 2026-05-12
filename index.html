@@ -4732,38 +4732,47 @@ function showKundenDetail(id){
 
 let _kundenSearch='';
 
-function renderKundenView(){
-  const m=document.getElementById('mainContent');
+function _buildKundenGrid(){
   const kunden=state.kunden||[];
   const q=_kundenSearch.toLowerCase();
   const filtered=q?kunden.filter(k=>(k.name||'').toLowerCase().includes(q)):kunden;
+  if(!filtered.length)
+    return `<div class="kunden-empty"><div class="kunden-empty-icon">👥</div><p>${q?'Aucun résultat pour "'+escHtml(q)+'"':'Aucun client enregistré.'}</p></div>`;
+  return filtered.map(k=>{
+    const projs=_kundenLinkedProjects(k);
+    const nextAction=k.naechsteAktion?`<div class="kunden-card-action">📅 ${escHtml(k.naechsteAktion)}${k.naechsteAktionDatum?' — '+formatDate(k.naechsteAktionDatum):''}</div>`:'';
+    const projTags=projs.length?`<div class="kunden-card-projs">${projs.map(p=>`<span class="kunden-proj-tag">🏗 ${escHtml(p.name)}</span>`).join('')}</div>`:'';
+    return `<div class="kunden-card" onclick="showKundenDetail(${k.id})">
+      <div class="kunden-card-top">
+        <div class="kunden-name">${escHtml(k.name)}</div>
+        <span class="kunden-typ-badge ktyp-${(k.typ||'privat').toLowerCase()}">${escHtml(k.typ||'Privat')}</span>
+      </div>
+      <div class="kunden-card-meta">${k.email?'✉ '+escHtml(k.email)+'&nbsp;&nbsp;':''}${k.telefon?'📞 '+escHtml(k.telefon):''}</div>
+      ${nextAction}${projTags}
+    </div>`;
+  }).join('');
+}
 
-  const grid=filtered.length===0
-    ?`<div class="kunden-empty"><div class="kunden-empty-icon">👥</div><p>${q?'Aucun résultat pour "'+escHtml(q)+'"':'Aucun client enregistré.'}</p></div>`
-    :filtered.map(k=>{
-      const projs=_kundenLinkedProjects(k);
-      const nextAction=k.naechsteAktion?`<div class="kunden-card-action">📅 ${escHtml(k.naechsteAktion)}${k.naechsteAktionDatum?' — '+formatDate(k.naechsteAktionDatum):''}</div>`:'';
-      const projTags=projs.length?`<div class="kunden-card-projs">${projs.map(p=>`<span class="kunden-proj-tag">🏗 ${escHtml(p.name)}</span>`).join('')}</div>`:'';
-      return `<div class="kunden-card" onclick="showKundenDetail(${k.id})">
-        <div class="kunden-card-top">
-          <div class="kunden-name">${escHtml(k.name)}</div>
-          <span class="kunden-typ-badge ktyp-${(k.typ||'privat').toLowerCase()}">${escHtml(k.typ||'Privat')}</span>
-        </div>
-        <div class="kunden-card-meta">${k.email?'✉ '+escHtml(k.email)+'&nbsp;&nbsp;':''}${k.telefon?'📞 '+escHtml(k.telefon):''}</div>
-        ${nextAction}${projTags}
-      </div>`;
-    }).join('');
+function filterKunden(){
+  const input=document.querySelector('.kunden-search');
+  if(input) _kundenSearch=input.value;
+  const grid=document.getElementById('kundenGrid');
+  if(grid) grid.innerHTML=_buildKundenGrid();
+}
 
+function renderKundenView(){
+  const m=document.getElementById('mainContent');
+  const kunden=state.kunden||[];
   m.innerHTML=`<div class="kunden-view">
     <div class="kunden-header">
-      <div class="kunden-title">👥 Kunden <span style="font-size:14px;font-weight:400;color:var(--ink3)">${kunden.length} client${kunden.length!==1?'s':''}</span></div>
+      <div class="kunden-title">👥 Clients <span style="font-size:14px;font-weight:400;color:var(--ink3)">${kunden.length} client${kunden.length!==1?'s':''}</span></div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
         <input class="kunden-search" placeholder="🔍 Rechercher…" value="${escHtml(_kundenSearch)}"
-          oninput="_kundenSearch=this.value;renderKundenView()">
+          oninput="filterKunden()">
         <button class="back-btn" style="background:var(--accent);color:#fff;border-color:var(--accent)" onclick="openKundeModal()">＋ Client</button>
       </div>
     </div>
-    <div class="kunden-grid">${grid}</div>
+    <div class="kunden-grid" id="kundenGrid">${_buildKundenGrid()}</div>
   </div>`;
 }
 

@@ -3801,8 +3801,7 @@ let _probFilter='open';
 function showProblemsView(){
   state.currentView='problems';
   state.currentChantierId=null;state.currentPhaseId=null;
-  document.getElementById('navDash').classList.remove('active');
-  document.getElementById('navProblems').classList.add('active');
+  renderSidebar();
   renderProblemsView();
 }
 function renderProblemsViewIfActive(){
